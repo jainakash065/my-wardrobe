@@ -1,6 +1,7 @@
 package com.jainakash.mywardrobe.wardrobe
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,6 +26,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -40,6 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -98,21 +101,18 @@ fun WardrobeScreen(
                 color = WardrobeInk
             )
             Spacer(modifier = Modifier.height(16.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                OutlinedTextField(
-                    value = state.query,
-                    onValueChange = onQueryChanged,
-                    label = { Text("Search wardrobe") },
-                    singleLine = true,
-                    modifier = Modifier.weight(1f)
-                )
-                OutlinedButton(
-                    onClick = { showFilters = true },
-                    modifier = Modifier.height(56.dp)
-                ) {
-                    Text(if (state.hasActiveFilters) "Filters (${state.activeFilterLabels.size})" else "Filters")
-                }
-            }
+            OutlinedTextField(
+                value = state.query,
+                onValueChange = onQueryChanged,
+                label = { Text("Search wardrobe") },
+                singleLine = true,
+                trailingIcon = {
+                    IconButton(onClick = { showFilters = true }) {
+                        FilterIcon(active = state.hasActiveFilters)
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
             Spacer(modifier = Modifier.height(14.dp))
             CategoryRow(
                 selectedCategory = state.selectedCategory,
@@ -144,6 +144,34 @@ fun WardrobeScreen(
             } else {
                 WardrobeGrid(items = state.items, onItemClicked = onItemClicked)
             }
+        }
+    }
+}
+
+@Composable
+private fun FilterIcon(active: Boolean) {
+    val color = if (active) WardrobeRose else WardrobeInk.copy(alpha = 0.72f)
+
+    Canvas(modifier = Modifier.size(24.dp)) {
+        val strokeWidth = 2.4.dp.toPx()
+        val lineStart = size.width * 0.16f
+        val lineEnd = size.width * 0.84f
+        val yValues = listOf(size.height * 0.28f, size.height * 0.50f, size.height * 0.72f)
+        val knobXValues = listOf(size.width * 0.62f, size.width * 0.38f, size.width * 0.70f)
+
+        yValues.forEachIndexed { index, y ->
+            drawLine(
+                color = color,
+                start = androidx.compose.ui.geometry.Offset(lineStart, y),
+                end = androidx.compose.ui.geometry.Offset(lineEnd, y),
+                strokeWidth = strokeWidth,
+                cap = StrokeCap.Round
+            )
+            drawCircle(
+                color = color,
+                radius = 3.2.dp.toPx(),
+                center = androidx.compose.ui.geometry.Offset(knobXValues[index], y)
+            )
         }
     }
 }
