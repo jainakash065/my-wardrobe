@@ -104,6 +104,7 @@ Future dashboard polish:
 - Settings tab for label management, backup/export, and preferences.
 - Store item creation timestamps so "Added this week" can be accurate instead of using recent item count.
 - Category cards should feel like a single unified tile with proper reusable illustration assets (bitmap or vector), not actual wardrobe photos and not hand-drawn code-path sketches, so browsing categories feels stable and intentional.
+- Backlog: further polish Browse by category illustrations so every card is instantly recognizable at phone size, with clearer category-specific artwork and less visual ambiguity.
 
 ### Capture
 
