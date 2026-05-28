@@ -2,5 +2,5 @@
 .gradle/
 build/
 app/build/
+dist/
 local.properties
-
