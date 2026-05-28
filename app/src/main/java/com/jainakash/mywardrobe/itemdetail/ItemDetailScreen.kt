@@ -32,6 +32,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.Switch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -59,6 +60,7 @@ fun ItemDetailScreen(
     onFabricChanged: (String) -> Unit,
     onSeasonChanged: (String) -> Unit,
     onNotesChanged: (String) -> Unit,
+    onFavoriteChanged: (Boolean) -> Unit,
     onSaveClicked: () -> Unit,
     onDeleteClicked: () -> Unit,
     onBackClicked: () -> Unit,
@@ -88,6 +90,10 @@ fun ItemDetailScreen(
                 )
             }
             PhotoPreview(photoPath = state.photoPath)
+            FavoriteToggle(
+                isFavorite = state.isFavorite,
+                onFavoriteChanged = onFavoriteChanged
+            )
             RequiredFields(
                 state = state,
                 onNameChanged = onNameChanged,
@@ -123,6 +129,32 @@ fun ItemDetailScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun FavoriteToggle(isFavorite: Boolean, onFavoriteChanged: (Boolean) -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(WardrobeRose.copy(alpha = 0.08f), RoundedCornerShape(8.dp))
+            .padding(14.dp)
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = "Favorite",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold,
+                color = WardrobeInk
+            )
+            Text(
+                text = if (isFavorite) "Marked for quick access" else "Add to favorites for quick access",
+                style = MaterialTheme.typography.bodySmall,
+                color = WardrobeInk.copy(alpha = 0.70f)
+            )
+        }
+        Switch(checked = isFavorite, onCheckedChange = onFavoriteChanged)
     }
 }
 

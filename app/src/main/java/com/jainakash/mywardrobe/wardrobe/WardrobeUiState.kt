@@ -26,6 +26,9 @@ data class WardrobeUiState(
 
     val dashboardResultItems: List<WardrobeItem>
         get() = items.take(4)
+
+    val favoriteItems: List<WardrobeItem>
+        get() = items.filter { it.isFavorite }
 }
 
 data class CategorySummary(

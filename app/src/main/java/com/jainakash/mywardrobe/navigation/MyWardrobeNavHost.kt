@@ -58,6 +58,7 @@ fun MyWardrobeNavHost(appContainer: AppContainer) {
                 onClearFilters = wardrobeViewModel::clearFilters,
                 onAddClicked = { navController.navigate(AppRoute.Capture.route) },
                 onReviewClicked = { navController.navigate(AppRoute.ReviewQueue.route) },
+                onFavoritesClicked = { navController.navigate(AppRoute.Favorites.route) },
                 onViewAllClicked = { navController.navigate(AppRoute.AllItems.route) },
                 onItemClicked = { itemId -> navController.navigate(AppRoute.ItemDetail.create(itemId)) }
             )
@@ -67,6 +68,27 @@ fun MyWardrobeNavHost(appContainer: AppContainer) {
 
             WardrobeAllItemsScreen(
                 state = state,
+                onQueryChanged = wardrobeViewModel::onQueryChanged,
+                onCategorySelected = wardrobeViewModel::onCategorySelected,
+                onFiltersChanged = wardrobeViewModel::onFilterChanged,
+                onClearCategoryFilter = wardrobeViewModel::clearCategoryFilter,
+                onClearColorFilter = wardrobeViewModel::clearColorFilter,
+                onClearOccasionFilter = wardrobeViewModel::clearOccasionFilter,
+                onClearSeasonFilter = wardrobeViewModel::clearSeasonFilter,
+                onClearFilters = wardrobeViewModel::clearFilters,
+                onAddClicked = { navController.navigate(AppRoute.Capture.route) },
+                onBackClicked = { navController.popBackStack() },
+                onItemClicked = { itemId -> navController.navigate(AppRoute.ItemDetail.create(itemId)) }
+            )
+        }
+        composable(AppRoute.Favorites.route) {
+            val state by wardrobeViewModel.uiState.collectAsState()
+
+            WardrobeAllItemsScreen(
+                state = state,
+                title = "Favorites",
+                visibleItems = state.favoriteItems,
+                emptyStateHasQueryOrFilter = true,
                 onQueryChanged = wardrobeViewModel::onQueryChanged,
                 onCategorySelected = wardrobeViewModel::onCategorySelected,
                 onFiltersChanged = wardrobeViewModel::onFilterChanged,
@@ -148,6 +170,7 @@ fun MyWardrobeNavHost(appContainer: AppContainer) {
                 onFabricChanged = viewModel::onFabricChanged,
                 onSeasonChanged = viewModel::onSeasonChanged,
                 onNotesChanged = viewModel::onNotesChanged,
+                onFavoriteChanged = viewModel::onFavoriteChanged,
                 onSaveClicked = {
                     viewModel.save {
                         navController.navigate(AppRoute.Wardrobe.route)

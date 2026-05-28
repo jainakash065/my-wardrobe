@@ -65,6 +65,10 @@ class ItemDetailViewModel(
         _formState.value = _formState.value.copy(notes = notes)
     }
 
+    fun onFavoriteChanged(isFavorite: Boolean) {
+        _formState.value = _formState.value.copy(isFavorite = isFavorite)
+    }
+
     fun save(onSaved: () -> Unit) {
         val state = _formState.value
         if (!state.isValid) {

@@ -47,7 +47,8 @@ class ItemFormStateTest {
             photoPath = "/photo.jpg",
             name = "Black kurti",
             category = WardrobeCategory.KURTI,
-            color = "Black"
+            color = "Black",
+            isFavorite = true
         )
 
         val item = state.toWardrobeItem(id = 7)
@@ -62,7 +63,8 @@ class ItemFormStateTest {
                 occasion = "",
                 fabric = "",
                 season = "",
-                notes = ""
+                notes = "",
+                isFavorite = true
             ),
             item
         )

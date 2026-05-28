@@ -9,6 +9,6 @@ data class WardrobeItem(
     val occasion: String,
     val fabric: String,
     val season: String,
-    val notes: String
+    val notes: String,
+    val isFavorite: Boolean = false
 )
-

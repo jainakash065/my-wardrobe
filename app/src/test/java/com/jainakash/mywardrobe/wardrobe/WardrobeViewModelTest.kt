@@ -142,6 +142,27 @@ class WardrobeViewModelTest {
     }
 
     @Test
+    fun `favorite items respect search and filters`() = runTest {
+        val repository = FakeWardrobeRepository(
+            listOf(
+                WardrobeItem(1, "/blue.jpg", "Blue silk saree", WardrobeCategory.SAREE, "Blue", "Wedding", "Silk", "Festive", "", isFavorite = true),
+                WardrobeItem(2, "/black.jpg", "Black cotton kurti", WardrobeCategory.KURTI, "Black", "Office", "Cotton", "Summer", "", isFavorite = true),
+                WardrobeItem(3, "/pink.jpg", "Pink silk dress", WardrobeCategory.DRESS, "Pink", "Party", "Silk", "Winter", "", isFavorite = false)
+            )
+        )
+        val viewModel = WardrobeViewModel(
+            repository = repository,
+            coroutineScope = backgroundScope,
+            dispatcher = UnconfinedTestDispatcher(testScheduler)
+        )
+
+        viewModel.onQueryChanged("silk")
+        viewModel.onFilterChanged(WardrobeFilters(color = "Blue"))
+
+        assertEquals(listOf("Blue silk saree"), viewModel.uiState.value.favoriteItems.map { it.name })
+    }
+
+    @Test
     fun `removing and clearing advanced filters updates visible items`() = runTest {
         val repository = FakeWardrobeRepository(
             listOf(

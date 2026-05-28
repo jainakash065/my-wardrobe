@@ -17,7 +17,8 @@ class WardrobeItemMapperTest {
             occasion = "Wedding",
             fabric = "Silk",
             season = "Festive",
-            notes = "Pair with blue saree"
+            notes = "Pair with blue saree",
+            isFavorite = true
         )
 
         val entity = item.toEntity()

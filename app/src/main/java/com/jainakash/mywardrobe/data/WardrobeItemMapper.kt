@@ -13,7 +13,8 @@ fun WardrobeItem.toEntity(): WardrobeItemEntity = WardrobeItemEntity(
     occasion = occasion,
     fabric = fabric,
     season = season,
-    notes = notes
+    notes = notes,
+    isFavorite = isFavorite
 )
 
 fun WardrobeItemDraft.toEntity(): WardrobeItemEntity = WardrobeItemEntity(
@@ -36,6 +37,6 @@ fun WardrobeItemEntity.toDomain(): WardrobeItem = WardrobeItem(
     occasion = occasion,
     fabric = fabric,
     season = season,
-    notes = notes
+    notes = notes,
+    isFavorite = isFavorite
 )
-

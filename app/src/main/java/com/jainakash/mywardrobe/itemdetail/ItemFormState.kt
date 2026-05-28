@@ -12,7 +12,8 @@ data class ItemFormState(
     val occasion: String = "",
     val fabric: String = "",
     val season: String = "",
-    val notes: String = ""
+    val notes: String = "",
+    val isFavorite: Boolean = false
 ) {
     val isValid: Boolean
         get() = photoPath.isNotBlank() && name.isNotBlank() && color.isNotBlank()
@@ -37,7 +38,8 @@ fun WardrobeItem.toFormState(): ItemFormState = ItemFormState(
     occasion = occasion,
     fabric = fabric,
     season = season,
-    notes = notes
+    notes = notes,
+    isFavorite = isFavorite
 )
 
 fun ItemFormState.toWardrobeItem(id: Long): WardrobeItem = WardrobeItem(
@@ -49,5 +51,6 @@ fun ItemFormState.toWardrobeItem(id: Long): WardrobeItem = WardrobeItem(
     occasion = occasion,
     fabric = fabric,
     season = season,
-    notes = notes
+    notes = notes,
+    isFavorite = isFavorite
 )

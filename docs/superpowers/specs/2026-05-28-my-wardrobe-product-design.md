@@ -79,6 +79,7 @@ Core elements:
 - Filter action inside the search field for structured filtering.
 - Summary cards for total items, items needing review, and recent additions.
 - Recently added section with a compact row of photo cards.
+- Favorites section/view for manually marked favorite wardrobe items.
 - When search text or filters are active, the dashboard should show matching item results immediately instead of only showing applied filter chips.
 - Browse by category section with category-specific illustrated icons and item counts.
 - Need review shortcut when incomplete items exist.
@@ -99,7 +100,7 @@ The full photo grid should live in an All Items view that is one tap away from t
 Future dashboard polish:
 
 - Bottom navigation with Wardrobe, Favorites, Outfits, and Settings.
-- Favorites tab for manually marked favorite items.
+- Bottom navigation should eventually include a dedicated Favorites tab; the first favorites version can use a section and full-screen filtered view.
 - Outfits tab for planned outfit combinations.
 - Settings tab for label management, backup/export, and preferences.
 - Store item creation timestamps so "Added this week" can be accurate instead of using recent item count.

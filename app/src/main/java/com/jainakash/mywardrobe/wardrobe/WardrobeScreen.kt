@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -106,6 +107,7 @@ fun WardrobeHomeScreen(
     onClearFilters: () -> Unit,
     onAddClicked: () -> Unit,
     onReviewClicked: () -> Unit,
+    onFavoritesClicked: () -> Unit,
     onViewAllClicked: () -> Unit,
     onItemClicked: (Long) -> Unit
 ) {
@@ -172,6 +174,10 @@ fun WardrobeHomeScreen(
                 } else {
                     RecentItemRow(items = state.recentItems, onItemClicked = onItemClicked)
                 }
+                if (state.favoriteItems.isNotEmpty()) {
+                    DashboardSectionHeader(title = "Favorites", actionLabel = "View all", onActionClicked = onFavoritesClicked)
+                    RecentItemRow(items = state.favoriteItems.take(4), onItemClicked = onItemClicked)
+                }
             }
             DashboardSectionHeader(title = "Browse by category", actionLabel = "View all", onActionClicked = onViewAllClicked)
             CategorySummaryGrid(
@@ -195,6 +201,9 @@ fun WardrobeHomeScreen(
 @Composable
 fun WardrobeAllItemsScreen(
     state: WardrobeUiState,
+    title: String = "All items",
+    visibleItems: List<WardrobeItem> = state.items,
+    emptyStateHasQueryOrFilter: Boolean = state.query.isNotBlank() || state.hasActiveFilters,
     onQueryChanged: (String) -> Unit,
     onCategorySelected: (WardrobeCategory?) -> Unit,
     onFiltersChanged: (WardrobeFilters) -> Unit,
@@ -236,7 +245,7 @@ fun WardrobeAllItemsScreen(
                     Text("Back")
                 }
                 Text(
-                    text = "All items",
+                    text = title,
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.SemiBold,
                     color = WardrobeInk
@@ -267,17 +276,17 @@ fun WardrobeAllItemsScreen(
             }
             Spacer(modifier = Modifier.height(12.dp))
             Text(
-                text = "${state.items.size} ${if (state.items.size == 1) "item" else "items"}",
+                text = "${visibleItems.size} ${if (visibleItems.size == 1) "item" else "items"}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = WardrobeInk.copy(alpha = 0.72f)
             )
             Spacer(modifier = Modifier.height(12.dp))
-            if (state.items.isEmpty()) {
+            if (visibleItems.isEmpty()) {
                 EmptyWardrobeState(
-                    hasQueryOrFilter = state.query.isNotBlank() || state.hasActiveFilters
+                    hasQueryOrFilter = emptyStateHasQueryOrFilter
                 )
             } else {
-                WardrobeGrid(items = state.items, onItemClicked = onItemClicked)
+                WardrobeGrid(items = visibleItems, onItemClicked = onItemClicked)
             }
         }
     }
@@ -467,15 +476,20 @@ private fun RecentItemCard(item: WardrobeItem, onClick: () -> Unit) {
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier.width(132.dp)
     ) {
-        AsyncImage(
-            model = item.photoPath,
-            contentDescription = item.name,
-            contentScale = ContentScale.Crop,
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(0.84f)
                 .background(Color.White)
-        )
+        ) {
+            AsyncImage(
+                model = item.photoPath,
+                contentDescription = item.name,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+            FavoriteBadge(isFavorite = item.isFavorite)
+        }
         Column(modifier = Modifier.padding(10.dp)) {
             Text(text = item.name.ifBlank { "Untitled item" }, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
             Text(text = item.category.displayName, style = MaterialTheme.typography.bodySmall, color = WardrobeInk.copy(alpha = 0.70f))
@@ -855,14 +869,20 @@ private fun WardrobeItemCard(item: WardrobeItem, onClick: () -> Unit) {
         onClick = onClick,
         shape = RoundedCornerShape(8.dp)
     ) {
-        AsyncImage(
-            model = item.photoPath,
-            contentDescription = item.name,
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(128.dp)
                 .background(Color.White)
-        )
+        ) {
+            AsyncImage(
+                model = item.photoPath,
+                contentDescription = item.name,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+            FavoriteBadge(isFavorite = item.isFavorite)
+        }
         Column(modifier = Modifier.padding(10.dp)) {
             Text(
                 text = item.name,
@@ -875,5 +895,28 @@ private fun WardrobeItemCard(item: WardrobeItem, onClick: () -> Unit) {
                 style = MaterialTheme.typography.bodySmall
             )
         }
+    }
+}
+
+@Composable
+private fun BoxScope.FavoriteBadge(isFavorite: Boolean) {
+    if (!isFavorite) {
+        return
+    }
+
+    Box(
+        modifier = Modifier
+            .align(Alignment.TopEnd)
+            .padding(8.dp)
+            .size(28.dp)
+            .background(WardrobeRose.copy(alpha = 0.92f), CircleShape),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = "★",
+            style = MaterialTheme.typography.bodySmall,
+            color = Color.White,
+            fontWeight = FontWeight.SemiBold
+        )
     }
 }
