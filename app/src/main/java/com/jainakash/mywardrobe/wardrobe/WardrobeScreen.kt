@@ -26,6 +26,7 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,6 +48,7 @@ fun WardrobeScreen(
     onQueryChanged: (String) -> Unit,
     onCategorySelected: (WardrobeCategory?) -> Unit,
     onAddClicked: () -> Unit,
+    onReviewClicked: () -> Unit,
     onItemClicked: (Long) -> Unit
 ) {
     Scaffold(
@@ -81,6 +83,13 @@ fun WardrobeScreen(
                 selectedCategory = state.selectedCategory,
                 onCategorySelected = onCategorySelected
             )
+            if (state.reviewItemCount > 0) {
+                Spacer(modifier = Modifier.height(14.dp))
+                ReviewQueuePrompt(
+                    count = state.reviewItemCount,
+                    onReviewClicked = onReviewClicked
+                )
+            }
             Spacer(modifier = Modifier.height(18.dp))
             if (state.items.isEmpty()) {
                 EmptyWardrobeState(
@@ -88,6 +97,41 @@ fun WardrobeScreen(
                 )
             } else {
                 WardrobeGrid(items = state.items, onItemClicked = onItemClicked)
+            }
+        }
+    }
+}
+
+@Composable
+private fun ReviewQueuePrompt(count: Int, onReviewClicked: () -> Unit) {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = WardrobeRose.copy(alpha = 0.10f)),
+        shape = RoundedCornerShape(8.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(14.dp)
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "$count ${if (count == 1) "item needs" else "items need"} review",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    color = WardrobeInk
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = "Complete details or delete drafts.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = WardrobeInk.copy(alpha = 0.72f)
+                )
+            }
+            OutlinedButton(onClick = onReviewClicked) {
+                Text("Review")
             }
         }
     }

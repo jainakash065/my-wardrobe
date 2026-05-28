@@ -52,6 +52,26 @@ class WardrobeViewModelTest {
         assertEquals(listOf("Blue saree"), viewModel.uiState.value.items.map { it.name })
     }
 
+    @Test
+    fun `review count includes incomplete items outside current filters`() = runTest {
+        val repository = FakeWardrobeRepository(
+            listOf(
+                WardrobeItem(1, "/draft.jpg", "", WardrobeCategory.OTHER, "", "", "", "", ""),
+                WardrobeItem(2, "/black.jpg", "Black kurti", WardrobeCategory.KURTI, "Black", "Office", "Cotton", "Summer", "")
+            )
+        )
+        val viewModel = WardrobeViewModel(
+            repository = repository,
+            coroutineScope = backgroundScope,
+            dispatcher = UnconfinedTestDispatcher(testScheduler)
+        )
+
+        viewModel.onQueryChanged("office")
+
+        assertEquals(1, viewModel.uiState.value.reviewItemCount)
+        assertEquals(listOf("Black kurti"), viewModel.uiState.value.items.map { it.name })
+    }
+
     private class FakeWardrobeRepository(items: List<WardrobeItem>) : WardrobeRepository {
         private val state = MutableStateFlow(items)
 

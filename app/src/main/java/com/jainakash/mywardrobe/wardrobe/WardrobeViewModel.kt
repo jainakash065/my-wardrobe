@@ -6,6 +6,7 @@ import com.jainakash.mywardrobe.data.WardrobeRepository
 import com.jainakash.mywardrobe.domain.SearchWardrobeItems
 import com.jainakash.mywardrobe.domain.WardrobeCategory
 import com.jainakash.mywardrobe.domain.WardrobeItem
+import com.jainakash.mywardrobe.review.needsReview
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -50,7 +51,9 @@ class WardrobeViewModel(
         val filtered = state.selectedCategory?.let { category ->
             searched.filter { it.category == category }
         } ?: searched
-        _uiState.value = state.copy(items = filtered)
+        _uiState.value = state.copy(
+            items = filtered,
+            reviewItemCount = allItems.count(::needsReview)
+        )
     }
 }
-

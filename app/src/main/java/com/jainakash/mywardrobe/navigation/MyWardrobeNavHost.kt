@@ -50,6 +50,7 @@ fun MyWardrobeNavHost(appContainer: AppContainer) {
                 onQueryChanged = viewModel::onQueryChanged,
                 onCategorySelected = viewModel::onCategorySelected,
                 onAddClicked = { navController.navigate(AppRoute.Capture.route) },
+                onReviewClicked = { navController.navigate(AppRoute.ReviewQueue.route) },
                 onItemClicked = { itemId -> navController.navigate(AppRoute.ItemDetail.create(itemId)) }
             )
         }
