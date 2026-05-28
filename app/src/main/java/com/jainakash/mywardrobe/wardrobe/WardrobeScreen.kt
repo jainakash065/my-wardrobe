@@ -2,6 +2,7 @@ package com.jainakash.mywardrobe.wardrobe
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,9 +20,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -56,7 +61,35 @@ import com.jainakash.mywardrobe.theme.WardrobeRose
 import com.jainakash.mywardrobe.theme.WardrobeTeal
 
 @Composable
-fun WardrobeScreen(
+private fun FilterIcon(active: Boolean) {
+    val color = if (active) WardrobeRose else WardrobeInk.copy(alpha = 0.72f)
+
+    Canvas(modifier = Modifier.size(24.dp)) {
+        val strokeWidth = 2.4.dp.toPx()
+        val lineStart = size.width * 0.16f
+        val lineEnd = size.width * 0.84f
+        val yValues = listOf(size.height * 0.28f, size.height * 0.50f, size.height * 0.72f)
+        val knobXValues = listOf(size.width * 0.62f, size.width * 0.38f, size.width * 0.70f)
+
+        yValues.forEachIndexed { index, y ->
+            drawLine(
+                color = color,
+                start = androidx.compose.ui.geometry.Offset(lineStart, y),
+                end = androidx.compose.ui.geometry.Offset(lineEnd, y),
+                strokeWidth = strokeWidth,
+                cap = StrokeCap.Round
+            )
+            drawCircle(
+                color = color,
+                radius = 3.2.dp.toPx(),
+                center = androidx.compose.ui.geometry.Offset(knobXValues[index], y)
+            )
+        }
+    }
+}
+
+@Composable
+fun WardrobeHomeScreen(
     state: WardrobeUiState,
     onQueryChanged: (String) -> Unit,
     onCategorySelected: (WardrobeCategory?) -> Unit,
@@ -68,6 +101,96 @@ fun WardrobeScreen(
     onClearFilters: () -> Unit,
     onAddClicked: () -> Unit,
     onReviewClicked: () -> Unit,
+    onViewAllClicked: () -> Unit,
+    onItemClicked: (Long) -> Unit
+) {
+    var showFilters by remember { mutableStateOf(false) }
+
+    if (showFilters) {
+        FilterSheet(
+            filters = state.filters,
+            onFiltersChanged = onFiltersChanged,
+            onClearFilters = onClearFilters,
+            onDismiss = { showFilters = false }
+        )
+    }
+
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(onClick = onAddClicked) {
+                Text("+", style = MaterialTheme.typography.headlineSmall)
+            }
+        }
+    ) { padding ->
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .verticalScroll(rememberScrollState())
+                .padding(20.dp)
+        ) {
+            Text(
+                text = "Wardrobe",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = WardrobeInk
+            )
+            SearchFilterField(
+                query = state.query,
+                hasActiveFilters = state.hasActiveFilters,
+                onQueryChanged = onQueryChanged,
+                onFilterClicked = { showFilters = true }
+            )
+            DashboardStats(state = state)
+            if (state.hasActiveFilters) {
+                ActiveFilterRow(
+                    filters = state.filters,
+                    onClearCategoryFilter = onClearCategoryFilter,
+                    onClearColorFilter = onClearColorFilter,
+                    onClearOccasionFilter = onClearOccasionFilter,
+                    onClearSeasonFilter = onClearSeasonFilter,
+                    onClearFilters = onClearFilters
+                )
+            }
+            if (state.reviewItemCount > 0) {
+                ReviewQueuePrompt(
+                    count = state.reviewItemCount,
+                    onReviewClicked = onReviewClicked
+                )
+            }
+            DashboardSectionHeader(title = "Recently added", actionLabel = "View all", onActionClicked = onViewAllClicked)
+            if (state.recentItems.isEmpty()) {
+                EmptyWardrobeState(hasQueryOrFilter = false)
+            } else {
+                RecentItemRow(items = state.recentItems, onItemClicked = onItemClicked)
+            }
+            DashboardSectionHeader(title = "Browse by category", actionLabel = "All items", onActionClicked = onViewAllClicked)
+            CategorySummaryGrid(
+                summaries = state.categorySummaries,
+                onCategoryClicked = { category ->
+                    onCategorySelected(category)
+                    onViewAllClicked()
+                }
+            )
+            Spacer(modifier = Modifier.height(80.dp))
+        }
+    }
+}
+
+@Composable
+fun WardrobeAllItemsScreen(
+    state: WardrobeUiState,
+    onQueryChanged: (String) -> Unit,
+    onCategorySelected: (WardrobeCategory?) -> Unit,
+    onFiltersChanged: (WardrobeFilters) -> Unit,
+    onClearCategoryFilter: () -> Unit,
+    onClearColorFilter: () -> Unit,
+    onClearOccasionFilter: () -> Unit,
+    onClearSeasonFilter: () -> Unit,
+    onClearFilters: () -> Unit,
+    onAddClicked: () -> Unit,
+    onBackClicked: () -> Unit,
     onItemClicked: (Long) -> Unit
 ) {
     var showFilters by remember { mutableStateOf(false) }
@@ -94,24 +217,23 @@ fun WardrobeScreen(
                 .padding(padding)
                 .padding(20.dp)
         ) {
-            Text(
-                text = "Wardrobe",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.SemiBold,
-                color = WardrobeInk
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            OutlinedTextField(
-                value = state.query,
-                onValueChange = onQueryChanged,
-                label = { Text("Search wardrobe") },
-                singleLine = true,
-                trailingIcon = {
-                    IconButton(onClick = { showFilters = true }) {
-                        FilterIcon(active = state.hasActiveFilters)
-                    }
-                },
-                modifier = Modifier.fillMaxWidth()
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                TextButton(onClick = onBackClicked) {
+                    Text("Back")
+                }
+                Text(
+                    text = "All items",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    color = WardrobeInk
+                )
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            SearchFilterField(
+                query = state.query,
+                hasActiveFilters = state.hasActiveFilters,
+                onQueryChanged = onQueryChanged,
+                onFilterClicked = { showFilters = true }
             )
             Spacer(modifier = Modifier.height(14.dp))
             CategoryRow(
@@ -129,14 +251,13 @@ fun WardrobeScreen(
                     onClearFilters = onClearFilters
                 )
             }
-            if (state.reviewItemCount > 0) {
-                Spacer(modifier = Modifier.height(14.dp))
-                ReviewQueuePrompt(
-                    count = state.reviewItemCount,
-                    onReviewClicked = onReviewClicked
-                )
-            }
-            Spacer(modifier = Modifier.height(18.dp))
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = "${state.items.size} ${if (state.items.size == 1) "item" else "items"}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = WardrobeInk.copy(alpha = 0.72f)
+            )
+            Spacer(modifier = Modifier.height(12.dp))
             if (state.items.isEmpty()) {
                 EmptyWardrobeState(
                     hasQueryOrFilter = state.query.isNotBlank() || state.hasActiveFilters
@@ -149,28 +270,141 @@ fun WardrobeScreen(
 }
 
 @Composable
-private fun FilterIcon(active: Boolean) {
-    val color = if (active) WardrobeRose else WardrobeInk.copy(alpha = 0.72f)
+private fun SearchFilterField(
+    query: String,
+    hasActiveFilters: Boolean,
+    onQueryChanged: (String) -> Unit,
+    onFilterClicked: () -> Unit
+) {
+    OutlinedTextField(
+        value = query,
+        onValueChange = onQueryChanged,
+        label = { Text("Search wardrobe") },
+        singleLine = true,
+        trailingIcon = {
+            IconButton(onClick = onFilterClicked) {
+                FilterIcon(active = hasActiveFilters)
+            }
+        },
+        modifier = Modifier.fillMaxWidth()
+    )
+}
 
-    Canvas(modifier = Modifier.size(24.dp)) {
-        val strokeWidth = 2.4.dp.toPx()
-        val lineStart = size.width * 0.16f
-        val lineEnd = size.width * 0.84f
-        val yValues = listOf(size.height * 0.28f, size.height * 0.50f, size.height * 0.72f)
-        val knobXValues = listOf(size.width * 0.62f, size.width * 0.38f, size.width * 0.70f)
+@Composable
+private fun DashboardStats(state: WardrobeUiState) {
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+        StatPill(label = "${state.totalItemCount}", caption = "items", modifier = Modifier.weight(1f))
+        StatPill(label = "${state.reviewItemCount}", caption = "need review", modifier = Modifier.weight(1f))
+        StatPill(label = "${state.recentItems.size}", caption = "recent", modifier = Modifier.weight(1f))
+    }
+}
 
-        yValues.forEachIndexed { index, y ->
-            drawLine(
-                color = color,
-                start = androidx.compose.ui.geometry.Offset(lineStart, y),
-                end = androidx.compose.ui.geometry.Offset(lineEnd, y),
-                strokeWidth = strokeWidth,
-                cap = StrokeCap.Round
+@Composable
+private fun StatPill(label: String, caption: String, modifier: Modifier = Modifier) {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = WardrobeTeal.copy(alpha = 0.10f)),
+        shape = RoundedCornerShape(8.dp),
+        modifier = modifier
+    ) {
+        Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp)) {
+            Text(text = label, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text(text = caption, style = MaterialTheme.typography.bodySmall, color = WardrobeInk.copy(alpha = 0.70f))
+        }
+    }
+}
+
+@Composable
+private fun DashboardSectionHeader(title: String, actionLabel: String, onActionClicked: () -> Unit) {
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold,
+            color = WardrobeInk,
+            modifier = Modifier.weight(1f)
+        )
+        TextButton(onClick = onActionClicked) {
+            Text(actionLabel)
+        }
+    }
+}
+
+@Composable
+private fun RecentItemRow(items: List<WardrobeItem>, onItemClicked: (Long) -> Unit) {
+    LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        items(items) { item ->
+            RecentItemCard(item = item, onClick = { onItemClicked(item.id) })
+        }
+    }
+}
+
+@Composable
+private fun RecentItemCard(item: WardrobeItem, onClick: () -> Unit) {
+    Card(
+        onClick = onClick,
+        shape = RoundedCornerShape(8.dp),
+        modifier = Modifier.width(132.dp)
+    ) {
+        AsyncImage(
+            model = item.photoPath,
+            contentDescription = item.name,
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(0.84f)
+                .background(Color.White)
+        )
+        Column(modifier = Modifier.padding(10.dp)) {
+            Text(text = item.name.ifBlank { "Untitled item" }, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+            Text(text = item.category.displayName, style = MaterialTheme.typography.bodySmall, color = WardrobeInk.copy(alpha = 0.70f))
+        }
+    }
+}
+
+@Composable
+private fun CategorySummaryGrid(
+    summaries: List<CategorySummary>,
+    onCategoryClicked: (WardrobeCategory) -> Unit
+) {
+    if (summaries.isEmpty()) {
+        Text("Categories will appear after items are added.", color = WardrobeInk.copy(alpha = 0.70f))
+        return
+    }
+
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        summaries.chunked(2).forEach { row ->
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+                row.forEach { summary ->
+                    CategorySummaryCard(
+                        summary = summary,
+                        onClick = { onCategoryClicked(summary.category) },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                if (row.size == 1) {
+                    Spacer(modifier = Modifier.weight(1f))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CategorySummaryCard(summary: CategorySummary, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    Card(
+        shape = RoundedCornerShape(8.dp),
+        modifier = modifier.clickable(onClick = onClick)
+    ) {
+        Column(modifier = Modifier.padding(14.dp)) {
+            Text(
+                text = summary.category.displayName,
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold
             )
-            drawCircle(
-                color = color,
-                radius = 3.2.dp.toPx(),
-                center = androidx.compose.ui.geometry.Offset(knobXValues[index], y)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "${summary.count} ${if (summary.count == 1) "item" else "items"}",
+                style = MaterialTheme.typography.bodySmall,
+                color = WardrobeInk.copy(alpha = 0.70f)
             )
         }
     }

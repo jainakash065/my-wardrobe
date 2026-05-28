@@ -73,6 +73,31 @@ class WardrobeViewModelTest {
     }
 
     @Test
+    fun `dashboard state exposes total count recent items and category counts`() = runTest {
+        val repository = FakeWardrobeRepository(
+            listOf(
+                WardrobeItem(1, "/blue.jpg", "Blue saree", WardrobeCategory.SAREE, "Blue", "Wedding", "Silk", "Festive", ""),
+                WardrobeItem(2, "/black.jpg", "Black kurti", WardrobeCategory.KURTI, "Black", "Office", "Cotton", "Summer", ""),
+                WardrobeItem(3, "/pink.jpg", "Pink dress", WardrobeCategory.DRESS, "Pink", "Party", "", "Winter", ""),
+                WardrobeItem(4, "/white.jpg", "White top", WardrobeCategory.TOP, "White", "Casual", "", "Summer", ""),
+                WardrobeItem(5, "/gold.jpg", "Gold dupatta", WardrobeCategory.DUPATTA, "Gold", "Festive", "", "Festive", "")
+            )
+        )
+        val viewModel = WardrobeViewModel(
+            repository = repository,
+            coroutineScope = backgroundScope,
+            dispatcher = UnconfinedTestDispatcher(testScheduler)
+        )
+
+        val state = viewModel.uiState.value
+
+        assertEquals(5, state.totalItemCount)
+        assertEquals(listOf("Gold dupatta", "White top", "Pink dress", "Black kurti"), state.recentItems.map { it.name })
+        assertEquals(1, state.categorySummaries.first { it.category == WardrobeCategory.SAREE }.count)
+        assertEquals(1, state.categorySummaries.first { it.category == WardrobeCategory.KURTI }.count)
+    }
+
+    @Test
     fun `advanced filters combine with search query`() = runTest {
         val repository = FakeWardrobeRepository(
             listOf(

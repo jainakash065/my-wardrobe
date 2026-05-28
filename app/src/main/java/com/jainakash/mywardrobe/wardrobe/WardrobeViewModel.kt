@@ -87,7 +87,20 @@ class WardrobeViewModel(
             .filter { item -> filters.season.isBlank() || item.season.equals(filters.season, ignoreCase = true) }
         _uiState.value = state.copy(
             items = filtered,
+            totalItemCount = allItems.size,
+            recentItems = allItems.sortedByDescending { it.id }.take(4),
+            categorySummaries = categorySummaries(),
             reviewItemCount = allItems.count(::needsReview)
         )
     }
+
+    private fun categorySummaries(): List<CategorySummary> =
+        WardrobeCategory.entries.mapNotNull { category ->
+            val count = allItems.count { it.category == category }
+            if (count == 0) {
+                null
+            } else {
+                CategorySummary(category = category, count = count)
+            }
+        }
 }

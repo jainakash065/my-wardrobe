@@ -19,12 +19,16 @@ import com.jainakash.mywardrobe.itemdetail.ItemDetailViewModel
 import com.jainakash.mywardrobe.launch.LaunchScreen
 import com.jainakash.mywardrobe.review.ReviewQueueScreen
 import com.jainakash.mywardrobe.review.ReviewQueueViewModel
-import com.jainakash.mywardrobe.wardrobe.WardrobeScreen
+import com.jainakash.mywardrobe.wardrobe.WardrobeAllItemsScreen
+import com.jainakash.mywardrobe.wardrobe.WardrobeHomeScreen
 import com.jainakash.mywardrobe.wardrobe.WardrobeViewModel
 
 @Composable
 fun MyWardrobeNavHost(appContainer: AppContainer) {
     val navController = rememberNavController()
+    val wardrobeViewModel = remember {
+        WardrobeViewModel(appContainer.wardrobeRepository)
+    }
 
     NavHost(
         navController = navController,
@@ -40,23 +44,39 @@ fun MyWardrobeNavHost(appContainer: AppContainer) {
             )
         }
         composable(AppRoute.Wardrobe.route) {
-            val viewModel = remember {
-                WardrobeViewModel(appContainer.wardrobeRepository)
-            }
-            val state by viewModel.uiState.collectAsState()
+            val state by wardrobeViewModel.uiState.collectAsState()
 
-            WardrobeScreen(
+            WardrobeHomeScreen(
                 state = state,
-                onQueryChanged = viewModel::onQueryChanged,
-                onCategorySelected = viewModel::onCategorySelected,
-                onFiltersChanged = viewModel::onFilterChanged,
-                onClearCategoryFilter = viewModel::clearCategoryFilter,
-                onClearColorFilter = viewModel::clearColorFilter,
-                onClearOccasionFilter = viewModel::clearOccasionFilter,
-                onClearSeasonFilter = viewModel::clearSeasonFilter,
-                onClearFilters = viewModel::clearFilters,
+                onQueryChanged = wardrobeViewModel::onQueryChanged,
+                onCategorySelected = wardrobeViewModel::onCategorySelected,
+                onFiltersChanged = wardrobeViewModel::onFilterChanged,
+                onClearCategoryFilter = wardrobeViewModel::clearCategoryFilter,
+                onClearColorFilter = wardrobeViewModel::clearColorFilter,
+                onClearOccasionFilter = wardrobeViewModel::clearOccasionFilter,
+                onClearSeasonFilter = wardrobeViewModel::clearSeasonFilter,
+                onClearFilters = wardrobeViewModel::clearFilters,
                 onAddClicked = { navController.navigate(AppRoute.Capture.route) },
                 onReviewClicked = { navController.navigate(AppRoute.ReviewQueue.route) },
+                onViewAllClicked = { navController.navigate(AppRoute.AllItems.route) },
+                onItemClicked = { itemId -> navController.navigate(AppRoute.ItemDetail.create(itemId)) }
+            )
+        }
+        composable(AppRoute.AllItems.route) {
+            val state by wardrobeViewModel.uiState.collectAsState()
+
+            WardrobeAllItemsScreen(
+                state = state,
+                onQueryChanged = wardrobeViewModel::onQueryChanged,
+                onCategorySelected = wardrobeViewModel::onCategorySelected,
+                onFiltersChanged = wardrobeViewModel::onFilterChanged,
+                onClearCategoryFilter = wardrobeViewModel::clearCategoryFilter,
+                onClearColorFilter = wardrobeViewModel::clearColorFilter,
+                onClearOccasionFilter = wardrobeViewModel::clearOccasionFilter,
+                onClearSeasonFilter = wardrobeViewModel::clearSeasonFilter,
+                onClearFilters = wardrobeViewModel::clearFilters,
+                onAddClicked = { navController.navigate(AppRoute.Capture.route) },
+                onBackClicked = { navController.popBackStack() },
                 onItemClicked = { itemId -> navController.navigate(AppRoute.ItemDetail.create(itemId)) }
             )
         }
