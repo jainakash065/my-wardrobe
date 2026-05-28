@@ -100,15 +100,7 @@ class WardrobeViewModel(
             if (count == 0) {
                 null
             } else {
-                CategorySummary(
-                    category = category,
-                    count = count,
-                    previewPhotoPath = allItems
-                        .filter { it.category == category }
-                        .maxByOrNull { it.id }
-                        ?.photoPath
-                        .orEmpty()
-                )
+                CategorySummary(category = category, count = count)
             }
         }
 }

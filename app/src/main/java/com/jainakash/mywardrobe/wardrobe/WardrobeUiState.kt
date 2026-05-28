@@ -24,6 +24,5 @@ data class WardrobeUiState(
 
 data class CategorySummary(
     val category: WardrobeCategory,
-    val count: Int,
-    val previewPhotoPath: String = ""
+    val count: Int
 )

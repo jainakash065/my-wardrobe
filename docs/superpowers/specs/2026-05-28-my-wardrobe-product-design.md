@@ -79,7 +79,7 @@ Core elements:
 - Filter action inside the search field for structured filtering.
 - Summary cards for total items, items needing review, and recent additions.
 - Recently added section with a compact row of photo cards.
-- Browse by category section with category image previews and item counts.
+- Browse by category section with category-specific illustrated icons and item counts.
 - Need review shortcut when incomplete items exist.
 - Camera action for adding clothes.
 
@@ -102,7 +102,7 @@ Future dashboard polish:
 - Outfits tab for planned outfit combinations.
 - Settings tab for label management, backup/export, and preferences.
 - Store item creation timestamps so "Added this week" can be accurate instead of using recent item count.
-- Category cards should keep showing a representative item image when available.
+- Category cards should use category-specific line-art illustrations, not actual wardrobe photos, so browsing categories feels stable and intentional.
 
 ### Capture
 
