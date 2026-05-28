@@ -72,6 +72,54 @@ class WardrobeViewModelTest {
         assertEquals(listOf("Black kurti"), viewModel.uiState.value.items.map { it.name })
     }
 
+    @Test
+    fun `advanced filters combine with search query`() = runTest {
+        val repository = FakeWardrobeRepository(
+            listOf(
+                WardrobeItem(1, "/blue.jpg", "Blue silk saree", WardrobeCategory.SAREE, "Blue", "Wedding", "Silk", "Festive", ""),
+                WardrobeItem(2, "/black.jpg", "Black cotton kurti", WardrobeCategory.KURTI, "Black", "Office", "Cotton", "Summer", ""),
+                WardrobeItem(3, "/pink.jpg", "Pink silk kurti", WardrobeCategory.KURTI, "Pink", "Party", "Silk", "Winter", "")
+            )
+        )
+        val viewModel = WardrobeViewModel(
+            repository = repository,
+            coroutineScope = backgroundScope,
+            dispatcher = UnconfinedTestDispatcher(testScheduler)
+        )
+
+        viewModel.onQueryChanged("silk")
+        viewModel.onFilterChanged(WardrobeFilters(color = "Pink", occasion = "Party"))
+
+        assertEquals(listOf("Pink silk kurti"), viewModel.uiState.value.items.map { it.name })
+        assertEquals(listOf("Color: Pink", "Occasion: Party"), viewModel.uiState.value.activeFilterLabels)
+    }
+
+    @Test
+    fun `removing and clearing advanced filters updates visible items`() = runTest {
+        val repository = FakeWardrobeRepository(
+            listOf(
+                WardrobeItem(1, "/blue.jpg", "Blue saree", WardrobeCategory.SAREE, "Blue", "Wedding", "Silk", "Festive", ""),
+                WardrobeItem(2, "/black.jpg", "Black kurti", WardrobeCategory.KURTI, "Black", "Office", "Cotton", "Summer", "")
+            )
+        )
+        val viewModel = WardrobeViewModel(
+            repository = repository,
+            coroutineScope = backgroundScope,
+            dispatcher = UnconfinedTestDispatcher(testScheduler)
+        )
+
+        viewModel.onFilterChanged(WardrobeFilters(color = "Blue", season = "Festive"))
+        viewModel.clearColorFilter()
+
+        assertEquals(listOf("Blue saree"), viewModel.uiState.value.items.map { it.name })
+        assertEquals(listOf("Season: Festive"), viewModel.uiState.value.activeFilterLabels)
+
+        viewModel.clearFilters()
+
+        assertEquals(listOf("Blue saree", "Black kurti"), viewModel.uiState.value.items.map { it.name })
+        assertEquals(emptyList<String>(), viewModel.uiState.value.activeFilterLabels)
+    }
+
     private class FakeWardrobeRepository(items: List<WardrobeItem>) : WardrobeRepository {
         private val state = MutableStateFlow(items)
 

@@ -41,16 +41,50 @@ class WardrobeViewModel(
     }
 
     fun onCategorySelected(category: WardrobeCategory?) {
-        _uiState.value = _uiState.value.copy(selectedCategory = category)
+        _uiState.value = _uiState.value.copy(filters = _uiState.value.filters.copy(category = category))
+        applyFilters()
+    }
+
+    fun onFilterChanged(filters: WardrobeFilters) {
+        _uiState.value = _uiState.value.copy(filters = filters)
+        applyFilters()
+    }
+
+    fun clearColorFilter() {
+        _uiState.value = _uiState.value.copy(filters = _uiState.value.filters.copy(color = ""))
+        applyFilters()
+    }
+
+    fun clearOccasionFilter() {
+        _uiState.value = _uiState.value.copy(filters = _uiState.value.filters.copy(occasion = ""))
+        applyFilters()
+    }
+
+    fun clearSeasonFilter() {
+        _uiState.value = _uiState.value.copy(filters = _uiState.value.filters.copy(season = ""))
+        applyFilters()
+    }
+
+    fun clearCategoryFilter() {
+        _uiState.value = _uiState.value.copy(filters = _uiState.value.filters.copy(category = null))
+        applyFilters()
+    }
+
+    fun clearFilters() {
+        _uiState.value = _uiState.value.copy(filters = WardrobeFilters())
         applyFilters()
     }
 
     private fun applyFilters() {
         val state = _uiState.value
+        val filters = state.filters
         val searched = SearchWardrobeItems.apply(allItems, state.query)
-        val filtered = state.selectedCategory?.let { category ->
-            searched.filter { it.category == category }
-        } ?: searched
+        val filtered = searched
+            .filter { item -> filters.category == null || item.category == filters.category }
+            .filter { item -> filters.color.isBlank() || item.color.equals(filters.color, ignoreCase = true) }
+            .filter { item -> filters.occasion.isBlank() || item.occasion.equals(filters.occasion, ignoreCase = true) }
+            .filter { item -> filters.fabric.isBlank() || item.fabric.equals(filters.fabric, ignoreCase = true) }
+            .filter { item -> filters.season.isBlank() || item.season.equals(filters.season, ignoreCase = true) }
         _uiState.value = state.copy(
             items = filtered,
             reviewItemCount = allItems.count(::needsReview)

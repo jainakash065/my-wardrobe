@@ -49,6 +49,12 @@ fun MyWardrobeNavHost(appContainer: AppContainer) {
                 state = state,
                 onQueryChanged = viewModel::onQueryChanged,
                 onCategorySelected = viewModel::onCategorySelected,
+                onFiltersChanged = viewModel::onFilterChanged,
+                onClearCategoryFilter = viewModel::clearCategoryFilter,
+                onClearColorFilter = viewModel::clearColorFilter,
+                onClearOccasionFilter = viewModel::clearOccasionFilter,
+                onClearSeasonFilter = viewModel::clearSeasonFilter,
+                onClearFilters = viewModel::clearFilters,
                 onAddClicked = { navController.navigate(AppRoute.Capture.route) },
                 onReviewClicked = { navController.navigate(AppRoute.ReviewQueue.route) },
                 onItemClicked = { itemId -> navController.navigate(AppRoute.ItemDetail.create(itemId)) }
