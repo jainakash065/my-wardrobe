@@ -6,7 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -25,8 +24,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.jainakash.mywardrobe.theme.WardrobeInk
 import com.jainakash.mywardrobe.theme.WardrobeMist
@@ -41,12 +41,12 @@ private const val DoorAnimationMillis = 780
 fun LaunchScreen(onFinished: () -> Unit) {
     var open by remember { mutableStateOf(false) }
     val leftDoorRotation by animateFloatAsState(
-        targetValue = if (open) -14f else 0f,
+        targetValue = if (open) -58f else 0f,
         animationSpec = tween(durationMillis = DoorAnimationMillis),
         label = "leftDoorRotation"
     )
     val rightDoorRotation by animateFloatAsState(
-        targetValue = if (open) 14f else 0f,
+        targetValue = if (open) 58f else 0f,
         animationSpec = tween(durationMillis = DoorAnimationMillis),
         label = "rightDoorRotation"
     )
@@ -99,10 +99,10 @@ private fun WardrobeOpeningIllustration(
                 .background(WardrobeTeal.copy(alpha = 0.14f), RoundedCornerShape(28.dp))
                 .align(Alignment.BottomCenter)
         )
-        PersonSilhouette(
+        GirlSilhouette(
             modifier = Modifier
                 .align(Alignment.BottomStart)
-                .offset(x = 28.dp, y = (-4).dp)
+                .offset(x = 20.dp, y = (-2).dp)
         )
         WardrobeCabinet(
             leftDoorRotation = leftDoorRotation,
@@ -113,24 +113,51 @@ private fun WardrobeOpeningIllustration(
 }
 
 @Composable
-private fun PersonSilhouette(modifier: Modifier = Modifier) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
+private fun GirlSilhouette(modifier: Modifier = Modifier) {
+    Box(
         modifier = modifier
+            .width(78.dp)
+            .height(132.dp)
     ) {
         Box(
             modifier = Modifier
-                .size(28.dp)
-                .background(WardrobeRose, CircleShape)
+                .size(42.dp)
+                .align(Alignment.TopCenter)
+                .background(WardrobeInk, CircleShape)
         )
         Box(
             modifier = Modifier
-                .width(46.dp)
-                .height(76.dp)
+                .size(28.dp)
+                .align(Alignment.TopCenter)
+                .offset(y = 8.dp)
+                .background(WardrobeMist, CircleShape)
+        )
+        Box(
+            modifier = Modifier
+                .width(54.dp)
+                .height(70.dp)
+                .align(Alignment.TopCenter)
+                .offset(y = 42.dp)
                 .background(
                     WardrobeRose.copy(alpha = 0.88f),
-                    RoundedCornerShape(24.dp, 24.dp, 12.dp, 12.dp)
+                    RoundedCornerShape(28.dp, 28.dp, 10.dp, 10.dp)
                 )
+        )
+        Box(
+            modifier = Modifier
+                .width(8.dp)
+                .height(28.dp)
+                .align(Alignment.BottomCenter)
+                .offset(x = (-10).dp)
+                .background(WardrobeInk, RoundedCornerShape(6.dp))
+        )
+        Box(
+            modifier = Modifier
+                .width(8.dp)
+                .height(28.dp)
+                .align(Alignment.BottomCenter)
+                .offset(x = 10.dp)
+                .background(WardrobeInk, RoundedCornerShape(6.dp))
         )
     }
 }
@@ -148,21 +175,6 @@ private fun WardrobeCabinet(
             .background(WardrobeInk, RoundedCornerShape(18.dp))
             .padding(7.dp)
     ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(5.dp),
-            modifier = Modifier.fillMaxSize()
-        ) {
-            WardrobeDoor(
-                rotation = leftDoorRotation,
-                knobAlignment = Alignment.CenterEnd,
-                modifier = Modifier.weight(1f)
-            )
-            WardrobeDoor(
-                rotation = rightDoorRotation,
-                knobAlignment = Alignment.CenterStart,
-                modifier = Modifier.weight(1f)
-            )
-        }
         ClothingHint(
             color = WardrobeRose,
             modifier = Modifier
@@ -175,19 +187,41 @@ private fun WardrobeCabinet(
                 .align(Alignment.TopCenter)
                 .offset(y = 56.dp)
         )
+        WardrobeDoor(
+            rotation = leftDoorRotation,
+            hinge = TransformOrigin(0f, 0.5f),
+            knobAlignment = Alignment.CenterEnd,
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .width(64.dp)
+                .height(160.dp)
+        )
+        WardrobeDoor(
+            rotation = rightDoorRotation,
+            hinge = TransformOrigin(1f, 0.5f),
+            knobAlignment = Alignment.CenterStart,
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .width(64.dp)
+                .height(160.dp)
+        )
     }
 }
 
 @Composable
 private fun WardrobeDoor(
     rotation: Float,
+    hinge: TransformOrigin,
     knobAlignment: Alignment,
     modifier: Modifier = Modifier
 ) {
     Box(
         modifier = modifier
-            .fillMaxSize()
-            .rotate(rotation)
+            .graphicsLayer {
+                rotationY = rotation
+                transformOrigin = hinge
+                cameraDistance = 12f * density
+            }
             .background(WardrobeMist, RoundedCornerShape(12.dp))
             .padding(8.dp)
     ) {
