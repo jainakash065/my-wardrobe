@@ -158,11 +158,20 @@ fun WardrobeHomeScreen(
                     onClearFilters = onClearFilters
                 )
             }
-            DashboardSectionHeader(title = "Recently added", actionLabel = "View all", onActionClicked = onViewAllClicked)
-            if (state.recentItems.isEmpty()) {
-                EmptyWardrobeState(hasQueryOrFilter = false)
+            if (state.shouldShowDashboardResults) {
+                DashboardSectionHeader(title = "Matching items", actionLabel = "View all", onActionClicked = onViewAllClicked)
+                if (state.dashboardResultItems.isEmpty()) {
+                    EmptyWardrobeState(hasQueryOrFilter = true)
+                } else {
+                    RecentItemRow(items = state.dashboardResultItems, onItemClicked = onItemClicked)
+                }
             } else {
-                RecentItemRow(items = state.recentItems, onItemClicked = onItemClicked)
+                DashboardSectionHeader(title = "Recently added", actionLabel = "View all", onActionClicked = onViewAllClicked)
+                if (state.recentItems.isEmpty()) {
+                    EmptyWardrobeState(hasQueryOrFilter = false)
+                } else {
+                    RecentItemRow(items = state.recentItems, onItemClicked = onItemClicked)
+                }
             }
             DashboardSectionHeader(title = "Browse by category", actionLabel = "View all", onActionClicked = onViewAllClicked)
             CategorySummaryGrid(
@@ -505,20 +514,13 @@ private fun CategorySummaryGrid(
 @Composable
 private fun CategorySummaryCard(summary: CategorySummary, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Card(
+        colors = CardDefaults.cardColors(containerColor = WardrobeRose.copy(alpha = 0.045f)),
         shape = RoundedCornerShape(8.dp),
         modifier = modifier.clickable(onClick = onClick)
     ) {
-        Column {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(92.dp)
-                    .background(WardrobeRose.copy(alpha = 0.04f)),
-                contentAlignment = Alignment.Center
-            ) {
-                CategoryIllustration(category = summary.category)
-            }
-            Column(modifier = Modifier.padding(14.dp)) {
+        Column(modifier = Modifier.padding(14.dp)) {
+            CategoryIllustration(category = summary.category)
+            Spacer(modifier = Modifier.height(10.dp))
             Text(
                 text = summary.category.displayName,
                 style = MaterialTheme.typography.titleSmall,
@@ -530,7 +532,6 @@ private fun CategorySummaryCard(summary: CategorySummary, onClick: () -> Unit, m
                 style = MaterialTheme.typography.bodySmall,
                 color = WardrobeInk.copy(alpha = 0.70f)
             )
-            }
         }
     }
 }
@@ -540,10 +541,10 @@ private fun CategoryIllustration(category: WardrobeCategory) {
     Image(
         painter = painterResource(id = categoryIllustrationRes(category)),
         contentDescription = category.displayName,
-        contentScale = ContentScale.Fit,
+        contentScale = ContentScale.Crop,
         modifier = Modifier
-            .fillMaxSize()
-            .padding(10.dp)
+            .fillMaxWidth()
+            .height(76.dp)
     )
 }
 

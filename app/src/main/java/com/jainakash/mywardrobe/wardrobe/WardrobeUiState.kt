@@ -20,6 +20,12 @@ data class WardrobeUiState(
 
     val hasActiveFilters: Boolean
         get() = filters.isActive
+
+    val shouldShowDashboardResults: Boolean
+        get() = query.isNotBlank() || hasActiveFilters
+
+    val dashboardResultItems: List<WardrobeItem>
+        get() = items.take(4)
 }
 
 data class CategorySummary(

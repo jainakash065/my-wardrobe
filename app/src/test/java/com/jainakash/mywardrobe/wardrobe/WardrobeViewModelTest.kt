@@ -120,6 +120,28 @@ class WardrobeViewModelTest {
     }
 
     @Test
+    fun `dashboard exposes matching items when search or filters are active`() = runTest {
+        val repository = FakeWardrobeRepository(
+            listOf(
+                WardrobeItem(1, "/blue.jpg", "Blue silk saree", WardrobeCategory.SAREE, "Blue", "Wedding", "Silk", "Festive", ""),
+                WardrobeItem(2, "/black.jpg", "Black cotton kurti", WardrobeCategory.KURTI, "Black", "Office", "Cotton", "Summer", "")
+            )
+        )
+        val viewModel = WardrobeViewModel(
+            repository = repository,
+            coroutineScope = backgroundScope,
+            dispatcher = UnconfinedTestDispatcher(testScheduler)
+        )
+
+        assertEquals(false, viewModel.uiState.value.shouldShowDashboardResults)
+
+        viewModel.onFilterChanged(WardrobeFilters(color = "Blue"))
+
+        assertEquals(true, viewModel.uiState.value.shouldShowDashboardResults)
+        assertEquals(listOf("Blue silk saree"), viewModel.uiState.value.dashboardResultItems.map { it.name })
+    }
+
+    @Test
     fun `removing and clearing advanced filters updates visible items`() = runTest {
         val repository = FakeWardrobeRepository(
             listOf(
