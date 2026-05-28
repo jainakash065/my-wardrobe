@@ -102,7 +102,7 @@ Future dashboard polish:
 - Outfits tab for planned outfit combinations.
 - Settings tab for label management, backup/export, and preferences.
 - Store item creation timestamps so "Added this week" can be accurate instead of using recent item count.
-- Category cards should use category-specific line-art illustrations, not actual wardrobe photos, so browsing categories feels stable and intentional.
+- Category cards should use proper reusable illustration assets (bitmap or vector), not actual wardrobe photos and not hand-drawn code-path sketches, so browsing categories feels stable and intentional.
 
 ### Capture
 

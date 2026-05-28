@@ -1,5 +1,7 @@
 package com.jainakash.mywardrobe.wardrobe
 
+import androidx.annotation.DrawableRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
@@ -47,12 +49,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.jainakash.mywardrobe.R
 import com.jainakash.mywardrobe.domain.WardrobeCategory
 import com.jainakash.mywardrobe.domain.WardrobeItem
 import com.jainakash.mywardrobe.itemdetail.commonColors
@@ -510,10 +513,10 @@ private fun CategorySummaryCard(summary: CategorySummary, onClick: () -> Unit, m
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(92.dp)
-                    .background(WardrobeRose.copy(alpha = 0.06f)),
+                    .background(WardrobeRose.copy(alpha = 0.04f)),
                 contentAlignment = Alignment.Center
             ) {
-                CategorySketchIcon(category = summary.category)
+                CategoryIllustration(category = summary.category)
             }
             Column(modifier = Modifier.padding(14.dp)) {
             Text(
@@ -533,142 +536,30 @@ private fun CategorySummaryCard(summary: CategorySummary, onClick: () -> Unit, m
 }
 
 @Composable
-private fun CategorySketchIcon(category: WardrobeCategory) {
-    Canvas(modifier = Modifier.size(58.dp)) {
-        val color = WardrobeRose
-        val strokeWidth = 2.4.dp.toPx()
-        val stroke = androidx.compose.ui.graphics.drawscope.Stroke(
-            width = strokeWidth,
-            cap = StrokeCap.Round
-        )
-
-        when (category) {
-            WardrobeCategory.SAREE -> {
-                val drape = Path().apply {
-                    moveTo(size.width * 0.34f, size.height * 0.16f)
-                    lineTo(size.width * 0.72f, size.height * 0.18f)
-                    lineTo(size.width * 0.58f, size.height * 0.82f)
-                    lineTo(size.width * 0.22f, size.height * 0.78f)
-                    close()
-                }
-                drawPath(path = drape, color = color, style = stroke)
-                drawLine(color, androidx.compose.ui.geometry.Offset(size.width * 0.34f, size.height * 0.16f), androidx.compose.ui.geometry.Offset(size.width * 0.66f, size.height * 0.80f), strokeWidth, cap = StrokeCap.Round)
-                drawLine(color, androidx.compose.ui.geometry.Offset(size.width * 0.42f, size.height * 0.32f), androidx.compose.ui.geometry.Offset(size.width * 0.30f, size.height * 0.76f), strokeWidth, cap = StrokeCap.Round)
-            }
-            WardrobeCategory.KURTI -> {
-                val kurti = Path().apply {
-                    moveTo(size.width * 0.34f, size.height * 0.18f)
-                    lineTo(size.width * 0.46f, size.height * 0.30f)
-                    lineTo(size.width * 0.54f, size.height * 0.30f)
-                    lineTo(size.width * 0.66f, size.height * 0.18f)
-                    lineTo(size.width * 0.82f, size.height * 0.38f)
-                    lineTo(size.width * 0.68f, size.height * 0.50f)
-                    lineTo(size.width * 0.70f, size.height * 0.84f)
-                    lineTo(size.width * 0.30f, size.height * 0.84f)
-                    lineTo(size.width * 0.32f, size.height * 0.50f)
-                    lineTo(size.width * 0.18f, size.height * 0.38f)
-                    close()
-                }
-                drawPath(path = kurti, color = color, style = stroke)
-                drawLine(color, androidx.compose.ui.geometry.Offset(size.width * 0.50f, size.height * 0.30f), androidx.compose.ui.geometry.Offset(size.width * 0.50f, size.height * 0.52f), strokeWidth, cap = StrokeCap.Round)
-            }
-            WardrobeCategory.TOP -> {
-                val top = Path().apply {
-                    moveTo(size.width * 0.30f, size.height * 0.26f)
-                    lineTo(size.width * 0.44f, size.height * 0.18f)
-                    lineTo(size.width * 0.56f, size.height * 0.18f)
-                    lineTo(size.width * 0.70f, size.height * 0.26f)
-                    lineTo(size.width * 0.84f, size.height * 0.42f)
-                    lineTo(size.width * 0.72f, size.height * 0.54f)
-                    lineTo(size.width * 0.66f, size.height * 0.84f)
-                    lineTo(size.width * 0.34f, size.height * 0.84f)
-                    lineTo(size.width * 0.28f, size.height * 0.54f)
-                    lineTo(size.width * 0.16f, size.height * 0.42f)
-                    close()
-                }
-                drawPath(path = top, color = color, style = stroke)
-            }
-            WardrobeCategory.DRESS -> {
-                val dress = Path().apply {
-                    moveTo(size.width * 0.38f, size.height * 0.18f)
-                    lineTo(size.width * 0.62f, size.height * 0.18f)
-                    lineTo(size.width * 0.66f, size.height * 0.42f)
-                    lineTo(size.width * 0.82f, size.height * 0.84f)
-                    lineTo(size.width * 0.18f, size.height * 0.84f)
-                    lineTo(size.width * 0.34f, size.height * 0.42f)
-                    close()
-                }
-                drawPath(path = dress, color = color, style = stroke)
-                drawLine(color, androidx.compose.ui.geometry.Offset(size.width * 0.34f, size.height * 0.42f), androidx.compose.ui.geometry.Offset(size.width * 0.66f, size.height * 0.42f), strokeWidth, cap = StrokeCap.Round)
-            }
-            WardrobeCategory.DUPATTA -> {
-                val scarf = Path().apply {
-                    moveTo(size.width * 0.24f, size.height * 0.20f)
-                    cubicTo(size.width * 0.74f, size.height * 0.14f, size.width * 0.34f, size.height * 0.66f, size.width * 0.78f, size.height * 0.80f)
-                    moveTo(size.width * 0.30f, size.height * 0.28f)
-                    cubicTo(size.width * 0.72f, size.height * 0.24f, size.width * 0.40f, size.height * 0.58f, size.width * 0.70f, size.height * 0.72f)
-                }
-                drawPath(path = scarf, color = color, style = stroke)
-            }
-            WardrobeCategory.BOTTOM -> {
-                val pants = Path().apply {
-                    moveTo(size.width * 0.34f, size.height * 0.18f)
-                    lineTo(size.width * 0.66f, size.height * 0.18f)
-                    lineTo(size.width * 0.72f, size.height * 0.84f)
-                    lineTo(size.width * 0.54f, size.height * 0.84f)
-                    lineTo(size.width * 0.50f, size.height * 0.42f)
-                    lineTo(size.width * 0.46f, size.height * 0.84f)
-                    lineTo(size.width * 0.28f, size.height * 0.84f)
-                    close()
-                }
-                drawPath(path = pants, color = color, style = stroke)
-            }
-            WardrobeCategory.OUTERWEAR -> {
-                val jacket = Path().apply {
-                    moveTo(size.width * 0.32f, size.height * 0.18f)
-                    lineTo(size.width * 0.50f, size.height * 0.34f)
-                    lineTo(size.width * 0.68f, size.height * 0.18f)
-                    lineTo(size.width * 0.76f, size.height * 0.84f)
-                    lineTo(size.width * 0.24f, size.height * 0.84f)
-                    close()
-                }
-                drawPath(path = jacket, color = color, style = stroke)
-                drawLine(color, androidx.compose.ui.geometry.Offset(size.width * 0.50f, size.height * 0.34f), androidx.compose.ui.geometry.Offset(size.width * 0.50f, size.height * 0.84f), strokeWidth, cap = StrokeCap.Round)
-            }
-            WardrobeCategory.ACCESSORY -> {
-                drawRoundRect(
-                    color = color,
-                    topLeft = androidx.compose.ui.geometry.Offset(size.width * 0.24f, size.height * 0.38f),
-                    size = androidx.compose.ui.geometry.Size(size.width * 0.52f, size.height * 0.40f),
-                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(5.dp.toPx(), 5.dp.toPx()),
-                    style = stroke
-                )
-                drawArc(
-                    color = color,
-                    startAngle = 200f,
-                    sweepAngle = 140f,
-                    useCenter = false,
-                    topLeft = androidx.compose.ui.geometry.Offset(size.width * 0.36f, size.height * 0.20f),
-                    size = androidx.compose.ui.geometry.Size(size.width * 0.28f, size.height * 0.32f),
-                    style = stroke
-                )
-            }
-            WardrobeCategory.OTHER -> {
-                drawLine(color, androidx.compose.ui.geometry.Offset(size.width * 0.22f, size.height * 0.70f), androidx.compose.ui.geometry.Offset(size.width * 0.78f, size.height * 0.70f), strokeWidth, cap = StrokeCap.Round)
-                drawLine(color, androidx.compose.ui.geometry.Offset(size.width * 0.50f, size.height * 0.30f), androidx.compose.ui.geometry.Offset(size.width * 0.50f, size.height * 0.70f), strokeWidth, cap = StrokeCap.Round)
-                drawArc(
-                    color = color,
-                    startAngle = 190f,
-                    sweepAngle = 250f,
-                    useCenter = false,
-                    topLeft = androidx.compose.ui.geometry.Offset(size.width * 0.36f, size.height * 0.14f),
-                    size = androidx.compose.ui.geometry.Size(size.width * 0.28f, size.height * 0.28f),
-                    style = stroke
-                )
-            }
-        }
-    }
+private fun CategoryIllustration(category: WardrobeCategory) {
+    Image(
+        painter = painterResource(id = categoryIllustrationRes(category)),
+        contentDescription = category.displayName,
+        contentScale = ContentScale.Fit,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(10.dp)
+    )
 }
+
+@DrawableRes
+private fun categoryIllustrationRes(category: WardrobeCategory): Int =
+    when (category) {
+        WardrobeCategory.SAREE -> R.drawable.category_saree
+        WardrobeCategory.KURTI -> R.drawable.category_kurti
+        WardrobeCategory.TOP -> R.drawable.category_top
+        WardrobeCategory.DRESS -> R.drawable.category_dress
+        WardrobeCategory.BOTTOM -> R.drawable.category_bottom
+        WardrobeCategory.DUPATTA,
+        WardrobeCategory.OUTERWEAR,
+        WardrobeCategory.ACCESSORY,
+        WardrobeCategory.OTHER -> R.drawable.category_other
+    }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
