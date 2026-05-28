@@ -66,4 +66,11 @@ class ItemFormStateTest {
             item
         )
     }
+
+    @Test
+    fun `quick pick options include common wardrobe values`() {
+        assertEquals(listOf("Black", "White", "Blue", "Pink", "Red", "Green", "Yellow", "Gold"), commonColors)
+        assertEquals(listOf("Casual", "Office", "Party", "Wedding", "Festive", "Travel"), commonOccasions)
+        assertEquals(listOf("Summer", "Winter", "Rainy", "All season", "Festive"), commonSeasons)
+    }
 }

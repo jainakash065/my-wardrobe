@@ -11,10 +11,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -33,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -93,6 +96,13 @@ fun ItemDetailScreen(
                 onSeasonChanged = onSeasonChanged,
                 onNotesChanged = onNotesChanged
             )
+            if (!state.isValid) {
+                Text(
+                    text = "Add a photo, name, and color to save this item.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = WardrobeInk.copy(alpha = 0.72f)
+                )
+            }
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Button(
                     onClick = onSaveClicked,
@@ -134,6 +144,7 @@ private fun PhotoPreview(photoPath: String) {
             AsyncImage(
                 model = photoPath,
                 contentDescription = "Clothing photo",
+                contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
         }
@@ -147,6 +158,7 @@ private fun RequiredFields(
     onCategoryChanged: (WardrobeCategory) -> Unit,
     onColorChanged: (String) -> Unit
 ) {
+    SectionTitle("Basics")
     OutlinedTextField(
         value = state.name,
         onValueChange = onNameChanged,
@@ -158,12 +170,11 @@ private fun RequiredFields(
         category = state.category,
         onCategoryChanged = onCategoryChanged
     )
-    OutlinedTextField(
+    QuickPickTextField(
+        label = "Color",
         value = state.color,
-        onValueChange = onColorChanged,
-        label = { Text("Color") },
-        singleLine = true,
-        modifier = Modifier.fillMaxWidth()
+        options = commonColors,
+        onValueChanged = onColorChanged
     )
 }
 
@@ -215,12 +226,12 @@ private fun OptionalFields(
     onSeasonChanged: (String) -> Unit,
     onNotesChanged: (String) -> Unit
 ) {
-    OutlinedTextField(
+    SectionTitle("Details")
+    QuickPickTextField(
+        label = "Occasion",
         value = state.occasion,
-        onValueChange = onOccasionChanged,
-        label = { Text("Occasion") },
-        singleLine = true,
-        modifier = Modifier.fillMaxWidth()
+        options = commonOccasions,
+        onValueChanged = onOccasionChanged
     )
     OutlinedTextField(
         value = state.fabric,
@@ -229,12 +240,11 @@ private fun OptionalFields(
         singleLine = true,
         modifier = Modifier.fillMaxWidth()
     )
-    OutlinedTextField(
+    QuickPickTextField(
+        label = "Season",
         value = state.season,
-        onValueChange = onSeasonChanged,
-        label = { Text("Season") },
-        singleLine = true,
-        modifier = Modifier.fillMaxWidth()
+        options = commonSeasons,
+        onValueChanged = onSeasonChanged
     )
     OutlinedTextField(
         value = state.notes,
@@ -243,4 +253,46 @@ private fun OptionalFields(
         minLines = 3,
         modifier = Modifier.fillMaxWidth()
     )
+}
+
+@Composable
+private fun SectionTitle(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.titleMedium,
+        fontWeight = FontWeight.SemiBold,
+        color = WardrobeInk
+    )
+}
+
+@Composable
+private fun QuickPickTextField(
+    label: String,
+    value: String,
+    options: List<String>,
+    onValueChanged: (String) -> Unit
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChanged,
+            label = { Text(label) },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState())
+        ) {
+            options.forEach { option ->
+                FilterChip(
+                    selected = value.equals(option, ignoreCase = true),
+                    onClick = { onValueChanged(option) },
+                    label = { Text(option) }
+                )
+            }
+        }
+    }
 }
