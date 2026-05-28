@@ -1,15 +1,9 @@
 package com.jainakash.mywardrobe.navigation
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -23,6 +17,8 @@ import com.jainakash.mywardrobe.capture.ImageCaptureController
 import com.jainakash.mywardrobe.itemdetail.ItemDetailScreen
 import com.jainakash.mywardrobe.itemdetail.ItemDetailViewModel
 import com.jainakash.mywardrobe.launch.LaunchScreen
+import com.jainakash.mywardrobe.review.ReviewQueueScreen
+import com.jainakash.mywardrobe.review.ReviewQueueViewModel
 import com.jainakash.mywardrobe.wardrobe.WardrobeScreen
 import com.jainakash.mywardrobe.wardrobe.WardrobeViewModel
 
@@ -85,7 +81,22 @@ fun MyWardrobeNavHost(appContainer: AppContainer) {
             )
         }
         composable(AppRoute.ReviewQueue.route) {
-            TemporaryScreen("Review Queue")
+            val viewModel = remember {
+                ReviewQueueViewModel(
+                    repository = appContainer.wardrobeRepository,
+                    imageStorage = appContainer.imageStorage
+                )
+            }
+            val state by viewModel.uiState.collectAsState()
+
+            ReviewQueueScreen(
+                state = state,
+                onBackClicked = { navController.popBackStack() },
+                onCompleteDetails = { itemId ->
+                    navController.navigate(AppRoute.ItemDetail.create(itemId))
+                },
+                onDeleteClicked = viewModel::delete
+            )
         }
         composable(
             route = AppRoute.ItemDetail.route,
@@ -124,18 +135,5 @@ fun MyWardrobeNavHost(appContainer: AppContainer) {
                 showDelete = true
             )
         }
-    }
-}
-
-@Composable
-private fun TemporaryScreen(title: String) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.headlineMedium
-        )
     }
 }
