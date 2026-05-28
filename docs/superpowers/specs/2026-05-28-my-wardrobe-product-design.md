@@ -18,6 +18,7 @@ The product should help the user answer two questions with minimal effort:
 - Low-friction capture: adding clothes must feel fast enough for a real wardrobe cleanup session.
 - Searchable by default: the home screen should make the wardrobe feel immediately browsable and searchable.
 - Local and private: V1 assumes data stays on the device.
+- Warm first impression: app launch should include a brief visual moment that feels personal and wardrobe-themed before the utility UI appears.
 - Future-ready, not future-heavy: leave room for outfit suggestions and richer metadata later, but do not burden V1.
 
 ## V1 Scope
@@ -53,6 +54,20 @@ The main navigation has four core surfaces:
 The introduction should be practical and brief. It should not feel like a marketing page.
 
 ## Screen Design
+
+### Launch Animation
+
+On every app open, before the Wardrobe screen appears, the app should show a short animation of a girl opening her wardrobe.
+
+Requirements:
+
+- Duration should be about one second.
+- The animation should transition smoothly into the Wardrobe screen.
+- It should feel warm and personal, not like a generic loading spinner.
+- It should not block the app for longer than needed.
+- It should be lightweight enough to load quickly on the Samsung Galaxy Z Flip 5.
+
+The implementation can use a Lottie-style animation, a compact vector animation, or another lightweight native animation approach. The exact asset style can be decided during visual design, but the concept is part of V1.
 
 ### Wardrobe
 
