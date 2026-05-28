@@ -69,16 +69,18 @@ Requirements:
 
 The implementation can use a Lottie-style animation, a compact vector animation, or another lightweight native animation approach. The exact asset style can be decided during visual design, but the concept is part of V1.
 
-### Wardrobe
+### Wardrobe Home
 
-The Wardrobe screen is the default home screen.
+The Wardrobe screen is the default home screen. It should behave as a dashboard, not a raw dump of every uploaded item. This matters once the wardrobe has hundreds of items.
 
 Core elements:
 
 - Search bar at the top.
-- Category chips for quick browsing.
-- Filter action for structured filtering.
-- Photo grid of wardrobe items.
+- Filter action inside the search field for structured filtering.
+- Summary cards for total items, items needing review, and recent additions.
+- Recently added section with a compact row of photo cards.
+- Browse by category section with category image previews and item counts.
+- Need review shortcut when incomplete items exist.
 - Camera action for adding clothes.
 
 Search should match:
@@ -91,7 +93,16 @@ Search should match:
 - Season
 - Notes
 
-The grid should prioritize photos and short labels. It should support empty, loading, and no-results states.
+The full photo grid should live in an All Items view that is one tap away from the dashboard through View all actions, category cards, search, or filters. The grid should prioritize photos and short labels. It should support empty, loading, and no-results states.
+
+Future dashboard polish:
+
+- Bottom navigation with Wardrobe, Favorites, Outfits, and Settings.
+- Favorites tab for manually marked favorite items.
+- Outfits tab for planned outfit combinations.
+- Settings tab for label management, backup/export, and preferences.
+- Store item creation timestamps so "Added this week" can be accurate instead of using recent item count.
+- Category cards should keep showing a representative item image when available.
 
 ### Capture
 

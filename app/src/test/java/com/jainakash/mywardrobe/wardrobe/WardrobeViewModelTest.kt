@@ -94,6 +94,7 @@ class WardrobeViewModelTest {
         assertEquals(5, state.totalItemCount)
         assertEquals(listOf("Gold dupatta", "White top", "Pink dress", "Black kurti"), state.recentItems.map { it.name })
         assertEquals(1, state.categorySummaries.first { it.category == WardrobeCategory.SAREE }.count)
+        assertEquals("/blue.jpg", state.categorySummaries.first { it.category == WardrobeCategory.SAREE }.previewPhotoPath)
         assertEquals(1, state.categorySummaries.first { it.category == WardrobeCategory.KURTI }.count)
     }
 

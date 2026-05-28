@@ -48,6 +48,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -153,19 +154,13 @@ fun WardrobeHomeScreen(
                     onClearFilters = onClearFilters
                 )
             }
-            if (state.reviewItemCount > 0) {
-                ReviewQueuePrompt(
-                    count = state.reviewItemCount,
-                    onReviewClicked = onReviewClicked
-                )
-            }
             DashboardSectionHeader(title = "Recently added", actionLabel = "View all", onActionClicked = onViewAllClicked)
             if (state.recentItems.isEmpty()) {
                 EmptyWardrobeState(hasQueryOrFilter = false)
             } else {
                 RecentItemRow(items = state.recentItems, onItemClicked = onItemClicked)
             }
-            DashboardSectionHeader(title = "Browse by category", actionLabel = "All items", onActionClicked = onViewAllClicked)
+            DashboardSectionHeader(title = "Browse by category", actionLabel = "View all", onActionClicked = onViewAllClicked)
             CategorySummaryGrid(
                 summaries = state.categorySummaries,
                 onCategoryClicked = { category ->
@@ -173,6 +168,12 @@ fun WardrobeHomeScreen(
                     onViewAllClicked()
                 }
             )
+            if (state.reviewItemCount > 0) {
+                ReviewQueuePrompt(
+                    count = state.reviewItemCount,
+                    onReviewClicked = onReviewClicked
+                )
+            }
             Spacer(modifier = Modifier.height(80.dp))
         }
     }
@@ -293,22 +294,130 @@ private fun SearchFilterField(
 @Composable
 private fun DashboardStats(state: WardrobeUiState) {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-        StatPill(label = "${state.totalItemCount}", caption = "items", modifier = Modifier.weight(1f))
-        StatPill(label = "${state.reviewItemCount}", caption = "need review", modifier = Modifier.weight(1f))
-        StatPill(label = "${state.recentItems.size}", caption = "recent", modifier = Modifier.weight(1f))
+        StatPill(
+            icon = DashboardStatIcon.Items,
+            label = "${state.totalItemCount}",
+            caption = "items",
+            modifier = Modifier.weight(1f)
+        )
+        StatPill(
+            icon = DashboardStatIcon.Review,
+            label = "${state.reviewItemCount}",
+            caption = "need review",
+            modifier = Modifier.weight(1f)
+        )
+        StatPill(
+            icon = DashboardStatIcon.Recent,
+            label = "${state.recentItems.size}",
+            caption = "recent",
+            modifier = Modifier.weight(1f)
+        )
     }
 }
 
 @Composable
-private fun StatPill(label: String, caption: String, modifier: Modifier = Modifier) {
+private fun StatPill(icon: DashboardStatIcon, label: String, caption: String, modifier: Modifier = Modifier) {
     Card(
         colors = CardDefaults.cardColors(containerColor = WardrobeTeal.copy(alpha = 0.10f)),
         shape = RoundedCornerShape(8.dp),
         modifier = modifier
     ) {
-        Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp)) {
-            Text(text = label, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+        Column(modifier = Modifier.padding(12.dp)) {
+            Box(
+                modifier = Modifier
+                    .size(30.dp)
+                    .background(WardrobeRose.copy(alpha = 0.14f), CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                DashboardStatIcon(icon = icon)
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = label, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.SemiBold)
             Text(text = caption, style = MaterialTheme.typography.bodySmall, color = WardrobeInk.copy(alpha = 0.70f))
+        }
+    }
+}
+
+private enum class DashboardStatIcon {
+    Items,
+    Review,
+    Recent
+}
+
+@Composable
+private fun DashboardStatIcon(icon: DashboardStatIcon) {
+    Canvas(modifier = Modifier.size(18.dp)) {
+        val strokeWidth = 1.8.dp.toPx()
+        val iconColor = WardrobeRose
+        when (icon) {
+            DashboardStatIcon.Items -> {
+                val corner = 2.dp.toPx()
+                drawRoundRect(
+                    color = iconColor,
+                    topLeft = androidx.compose.ui.geometry.Offset(size.width * 0.22f, size.height * 0.18f),
+                    size = androidx.compose.ui.geometry.Size(size.width * 0.56f, size.height * 0.64f),
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(corner, corner),
+                    style = androidx.compose.ui.graphics.drawscope.Stroke(width = strokeWidth)
+                )
+                drawLine(
+                    color = iconColor,
+                    start = androidx.compose.ui.geometry.Offset(size.width * 0.34f, size.height * 0.34f),
+                    end = androidx.compose.ui.geometry.Offset(size.width * 0.66f, size.height * 0.34f),
+                    strokeWidth = strokeWidth,
+                    cap = StrokeCap.Round
+                )
+                drawLine(
+                    color = iconColor,
+                    start = androidx.compose.ui.geometry.Offset(size.width * 0.34f, size.height * 0.50f),
+                    end = androidx.compose.ui.geometry.Offset(size.width * 0.66f, size.height * 0.50f),
+                    strokeWidth = strokeWidth,
+                    cap = StrokeCap.Round
+                )
+            }
+            DashboardStatIcon.Review -> {
+                drawCircle(
+                    color = iconColor,
+                    radius = size.minDimension * 0.34f,
+                    center = androidx.compose.ui.geometry.Offset(size.width * 0.50f, size.height * 0.50f),
+                    style = androidx.compose.ui.graphics.drawscope.Stroke(width = strokeWidth)
+                )
+                drawLine(
+                    color = iconColor,
+                    start = androidx.compose.ui.geometry.Offset(size.width * 0.36f, size.height * 0.50f),
+                    end = androidx.compose.ui.geometry.Offset(size.width * 0.47f, size.height * 0.62f),
+                    strokeWidth = strokeWidth,
+                    cap = StrokeCap.Round
+                )
+                drawLine(
+                    color = iconColor,
+                    start = androidx.compose.ui.geometry.Offset(size.width * 0.47f, size.height * 0.62f),
+                    end = androidx.compose.ui.geometry.Offset(size.width * 0.68f, size.height * 0.38f),
+                    strokeWidth = strokeWidth,
+                    cap = StrokeCap.Round
+                )
+            }
+            DashboardStatIcon.Recent -> {
+                drawCircle(
+                    color = iconColor,
+                    radius = size.minDimension * 0.35f,
+                    center = androidx.compose.ui.geometry.Offset(size.width * 0.50f, size.height * 0.50f),
+                    style = androidx.compose.ui.graphics.drawscope.Stroke(width = strokeWidth)
+                )
+                drawLine(
+                    color = iconColor,
+                    start = androidx.compose.ui.geometry.Offset(size.width * 0.50f, size.height * 0.50f),
+                    end = androidx.compose.ui.geometry.Offset(size.width * 0.50f, size.height * 0.30f),
+                    strokeWidth = strokeWidth,
+                    cap = StrokeCap.Round
+                )
+                drawLine(
+                    color = iconColor,
+                    start = androidx.compose.ui.geometry.Offset(size.width * 0.50f, size.height * 0.50f),
+                    end = androidx.compose.ui.geometry.Offset(size.width * 0.66f, size.height * 0.58f),
+                    strokeWidth = strokeWidth,
+                    cap = StrokeCap.Round
+                )
+            }
         }
     }
 }
@@ -324,7 +433,7 @@ private fun DashboardSectionHeader(title: String, actionLabel: String, onActionC
             modifier = Modifier.weight(1f)
         )
         TextButton(onClick = onActionClicked) {
-            Text(actionLabel)
+            Text("$actionLabel >")
         }
     }
 }
@@ -348,6 +457,7 @@ private fun RecentItemCard(item: WardrobeItem, onClick: () -> Unit) {
         AsyncImage(
             model = item.photoPath,
             contentDescription = item.name,
+            contentScale = ContentScale.Crop,
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(0.84f)
@@ -394,7 +504,23 @@ private fun CategorySummaryCard(summary: CategorySummary, onClick: () -> Unit, m
         shape = RoundedCornerShape(8.dp),
         modifier = modifier.clickable(onClick = onClick)
     ) {
-        Column(modifier = Modifier.padding(14.dp)) {
+        Column {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(92.dp)
+                    .background(WardrobeTeal.copy(alpha = 0.10f))
+            ) {
+                if (summary.previewPhotoPath.isNotBlank()) {
+                    AsyncImage(
+                        model = summary.previewPhotoPath,
+                        contentDescription = summary.category.displayName,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+            }
+            Column(modifier = Modifier.padding(14.dp)) {
             Text(
                 text = summary.category.displayName,
                 style = MaterialTheme.typography.titleSmall,
@@ -406,6 +532,7 @@ private fun CategorySummaryCard(summary: CategorySummary, onClick: () -> Unit, m
                 style = MaterialTheme.typography.bodySmall,
                 color = WardrobeInk.copy(alpha = 0.70f)
             )
+            }
         }
     }
 }
