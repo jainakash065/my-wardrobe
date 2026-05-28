@@ -157,9 +157,20 @@ Future fields:
 - Last worn date
 - Outfit combinations
 
-## Suggested Initial Categories
+## Labels And Category Personalization
 
-The first version should support editable categories, with sensible defaults:
+The first version can start with fixed category labels, but future versions should make wardrobe labels customizable. Labels are the visible chips and classification values such as All, Saree, Kurti, Top, Dress, and similar groupings.
+
+The app should not assume the wardrobe belongs only to women. During setup or in settings, the user should be able to choose who the wardrobe is for, for example:
+
+- Woman
+- Man
+- Girl
+- Boy
+- Child
+- General wardrobe
+
+Based on that choice, the app should suggest a sensible default label set. For the first intended user, the default women's set can include:
 
 - Saree
 - Kurti
@@ -171,7 +182,22 @@ The first version should support editable categories, with sensible defaults:
 - Accessory
 - Other
 
-The app should not assume the wardrobe belongs only to women, but the defaults should work well for the first intended user.
+Users should be able to:
+
+- Add new labels.
+- Rename labels.
+- Hide labels from the visible chip/filter list.
+- Unhide labels later.
+- Delete labels only when no wardrobe items are classified under that label.
+
+Important label behavior:
+
+- The All chip is a system view, not a normal user label.
+- A hidden label remains valid data and still exists for items already using it.
+- Hiding a label should remove it from the normal visible chip list, but it should not delete or reclassify items.
+- Deleting a label must be blocked if any item currently uses it.
+- If a label is hidden but items use it, those items should still appear in All and search results.
+- Settings should clearly distinguish Hide from Delete so users do not fear losing item data.
 
 ## Filters
 
@@ -208,6 +234,7 @@ Future improvements can include:
 - Image-based duplicate detection.
 - Backup/export.
 - Automatic category or color suggestions from photos.
+- Custom wardrobe labels with person-specific defaults, hide/unhide behavior, and guarded delete rules.
 
 ## Success Criteria
 
