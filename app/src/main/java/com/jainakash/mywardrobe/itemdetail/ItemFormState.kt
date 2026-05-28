@@ -1,6 +1,7 @@
 package com.jainakash.mywardrobe.itemdetail
 
 import com.jainakash.mywardrobe.domain.WardrobeCategory
+import com.jainakash.mywardrobe.domain.WardrobeItem
 import com.jainakash.mywardrobe.domain.WardrobeItemDraft
 
 data class ItemFormState(
@@ -28,3 +29,25 @@ data class ItemFormState(
     )
 }
 
+fun WardrobeItem.toFormState(): ItemFormState = ItemFormState(
+    photoPath = photoPath,
+    name = name,
+    category = category,
+    color = color,
+    occasion = occasion,
+    fabric = fabric,
+    season = season,
+    notes = notes
+)
+
+fun ItemFormState.toWardrobeItem(id: Long): WardrobeItem = WardrobeItem(
+    id = id,
+    photoPath = photoPath,
+    name = name,
+    category = category,
+    color = color,
+    occasion = occasion,
+    fabric = fabric,
+    season = season,
+    notes = notes
+)

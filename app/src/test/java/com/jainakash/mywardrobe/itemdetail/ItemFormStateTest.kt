@@ -1,6 +1,7 @@
 package com.jainakash.mywardrobe.itemdetail
 
 import com.jainakash.mywardrobe.domain.WardrobeCategory
+import com.jainakash.mywardrobe.domain.WardrobeItem
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -37,5 +38,32 @@ class ItemFormStateTest {
         assertEquals("Silk", draft.fabric)
         assertEquals("Festive", draft.season)
         assertEquals("Gold border", draft.notes)
+    }
+
+    @Test
+    fun `form converts to wardrobe item with id`() {
+        val state = ItemFormState(
+            photoPath = "/photo.jpg",
+            name = "Black kurti",
+            category = WardrobeCategory.KURTI,
+            color = "Black"
+        )
+
+        val item = state.toWardrobeItem(id = 7)
+
+        assertEquals(
+            WardrobeItem(
+                id = 7,
+                photoPath = "/photo.jpg",
+                name = "Black kurti",
+                category = WardrobeCategory.KURTI,
+                color = "Black",
+                occasion = "",
+                fabric = "",
+                season = "",
+                notes = ""
+            ),
+            item
+        )
     }
 }

@@ -10,10 +10,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavType
 import com.jainakash.mywardrobe.AppContainer
+import com.jainakash.mywardrobe.capture.CaptureScreen
+import com.jainakash.mywardrobe.capture.CaptureViewModel
+import com.jainakash.mywardrobe.capture.ImageCaptureController
 import com.jainakash.mywardrobe.itemdetail.ItemDetailScreen
 import com.jainakash.mywardrobe.itemdetail.ItemDetailViewModel
 import com.jainakash.mywardrobe.launch.LaunchScreen
@@ -52,13 +58,43 @@ fun MyWardrobeNavHost(appContainer: AppContainer) {
             )
         }
         composable(AppRoute.Capture.route) {
-            TemporaryScreen("Capture")
+            val context = LocalContext.current
+            val viewModel = remember {
+                CaptureViewModel(
+                    repository = appContainer.wardrobeRepository,
+                    imageCaptureController = ImageCaptureController(
+                        contentResolver = context.contentResolver,
+                        imageStorage = appContainer.imageStorage
+                    )
+                )
+            }
+
+            CaptureScreen(
+                onBackClicked = { navController.popBackStack() },
+                onSingleImported = { itemId ->
+                    navController.navigate(AppRoute.ItemDetail.create(itemId))
+                },
+                onBatchImported = {
+                    navController.navigate(AppRoute.ReviewQueue.route)
+                },
+                importSingle = viewModel::importSingle,
+                importBatch = viewModel::importBatch
+            )
         }
         composable(AppRoute.ReviewQueue.route) {
             TemporaryScreen("Review Queue")
         }
-        composable(AppRoute.ItemDetail.route) {
-            val viewModel = remember { ItemDetailViewModel() }
+        composable(
+            route = AppRoute.ItemDetail.route,
+            arguments = listOf(navArgument("itemId") { type = NavType.LongType })
+        ) { backStackEntry ->
+            val itemId = backStackEntry.arguments?.getLong("itemId") ?: return@composable
+            val viewModel = remember(itemId) {
+                ItemDetailViewModel(
+                    repository = appContainer.wardrobeRepository,
+                    itemId = itemId
+                )
+            }
             val state by viewModel.formState.collectAsState()
 
             ItemDetailScreen(
@@ -70,7 +106,11 @@ fun MyWardrobeNavHost(appContainer: AppContainer) {
                 onFabricChanged = viewModel::onFabricChanged,
                 onSeasonChanged = viewModel::onSeasonChanged,
                 onNotesChanged = viewModel::onNotesChanged,
-                onSaveClicked = { navController.navigate(AppRoute.Wardrobe.route) },
+                onSaveClicked = {
+                    viewModel.save {
+                        navController.navigate(AppRoute.Wardrobe.route)
+                    }
+                },
                 onDeleteClicked = { navController.navigate(AppRoute.Wardrobe.route) },
                 onBackClicked = { navController.popBackStack() },
                 showDelete = false
