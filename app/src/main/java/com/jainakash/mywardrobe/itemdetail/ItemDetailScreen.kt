@@ -1,6 +1,8 @@
 package com.jainakash.mywardrobe.itemdetail
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,8 +13,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -35,6 +39,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -174,7 +179,8 @@ private fun RequiredFields(
         label = "Color",
         value = state.color,
         options = commonColors,
-        onValueChanged = onColorChanged
+        onValueChanged = onColorChanged,
+        useColorSwatches = true
     )
 }
 
@@ -270,7 +276,8 @@ private fun QuickPickTextField(
     label: String,
     value: String,
     options: List<String>,
-    onValueChanged: (String) -> Unit
+    onValueChanged: (String) -> Unit,
+    useColorSwatches: Boolean = false
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         OutlinedTextField(
@@ -287,12 +294,56 @@ private fun QuickPickTextField(
                 .horizontalScroll(rememberScrollState())
         ) {
             options.forEach { option ->
-                FilterChip(
-                    selected = value.equals(option, ignoreCase = true),
-                    onClick = { onValueChanged(option) },
-                    label = { Text(option) }
-                )
+                if (useColorSwatches) {
+                    ColorOptionChip(
+                        option = option,
+                        selected = value.equals(option, ignoreCase = true),
+                        onClick = { onValueChanged(option) }
+                    )
+                } else {
+                    FilterChip(
+                        selected = value.equals(option, ignoreCase = true),
+                        onClick = { onValueChanged(option) },
+                        label = { Text(option) }
+                    )
+                }
             }
         }
+    }
+}
+
+@Composable
+private fun ColorOptionChip(
+    option: String,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    val style = styleForColorOption(option)
+    val borderWidth = if (selected) 2.dp else 1.dp
+    val borderColor = if (selected) WardrobeRose else style.borderColor
+    val shape = RoundedCornerShape(18.dp)
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .clip(shape)
+            .background(style.backgroundColor, shape)
+            .border(borderWidth, borderColor, shape)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 12.dp, vertical = 8.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(14.dp)
+                .background(style.contentColor.copy(alpha = 0.18f), CircleShape)
+                .border(1.dp, style.contentColor.copy(alpha = 0.50f), CircleShape)
+        )
+        Spacer(modifier = Modifier.width(6.dp))
+        Text(
+            text = option,
+            style = MaterialTheme.typography.bodySmall,
+            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+            color = style.contentColor
+        )
     }
 }

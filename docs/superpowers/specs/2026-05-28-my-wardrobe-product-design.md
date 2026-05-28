@@ -211,6 +211,18 @@ V1 filters should include:
 
 Filters should be optional. The basic search and visual grid should remain useful without meticulous tagging.
 
+Future search improvements should include an advanced filter experience similar to shopping apps such as Myntra. This should let the user combine structured filters, review selected filters as removable chips, clear filters quickly, and browse matching wardrobe items without losing the simple top-level search.
+
+Advanced filters can include:
+
+- Category or custom label
+- Color
+- Occasion
+- Fabric
+- Season
+- Hidden or visible labels, when customizable labels are implemented
+- Future fields such as brand, size, worn count, and last worn date
+
 ## Non-Goals For V1
 
 The following are intentionally out of scope for V1:
