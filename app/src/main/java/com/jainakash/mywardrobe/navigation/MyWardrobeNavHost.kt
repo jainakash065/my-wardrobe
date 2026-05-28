@@ -1,11 +1,11 @@
 package com.jainakash.mywardrobe.navigation
 
-import androidx.compose.runtime.collectAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -14,6 +14,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.jainakash.mywardrobe.AppContainer
+import com.jainakash.mywardrobe.itemdetail.ItemDetailScreen
+import com.jainakash.mywardrobe.itemdetail.ItemDetailViewModel
 import com.jainakash.mywardrobe.launch.LaunchScreen
 import com.jainakash.mywardrobe.wardrobe.WardrobeScreen
 import com.jainakash.mywardrobe.wardrobe.WardrobeViewModel
@@ -56,7 +58,23 @@ fun MyWardrobeNavHost(appContainer: AppContainer) {
             TemporaryScreen("Review Queue")
         }
         composable(AppRoute.ItemDetail.route) {
-            TemporaryScreen("Item Detail")
+            val viewModel = remember { ItemDetailViewModel() }
+            val state by viewModel.formState.collectAsState()
+
+            ItemDetailScreen(
+                state = state,
+                onNameChanged = viewModel::onNameChanged,
+                onCategoryChanged = viewModel::onCategoryChanged,
+                onColorChanged = viewModel::onColorChanged,
+                onOccasionChanged = viewModel::onOccasionChanged,
+                onFabricChanged = viewModel::onFabricChanged,
+                onSeasonChanged = viewModel::onSeasonChanged,
+                onNotesChanged = viewModel::onNotesChanged,
+                onSaveClicked = { navController.navigate(AppRoute.Wardrobe.route) },
+                onDeleteClicked = { navController.navigate(AppRoute.Wardrobe.route) },
+                onBackClicked = { navController.popBackStack() },
+                showDelete = false
+            )
         }
     }
 }
