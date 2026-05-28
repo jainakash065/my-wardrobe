@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts.PickMultipleVisualMedia
+import androidx.activity.result.contract.ActivityResultContracts.TakePicture
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -34,12 +35,30 @@ fun CaptureScreen(
     onBackClicked: () -> Unit,
     onSingleImported: (Long) -> Unit,
     onBatchImported: () -> Unit,
+    createCameraImageUri: () -> Uri,
+    importCameraPhoto: suspend (Uri) -> Long,
     importSingle: suspend (Uri) -> Long,
     importBatch: suspend (List<Uri>) -> List<Long>
 ) {
     val coroutineScope = rememberCoroutineScope()
     var isImporting by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    var pendingCameraUri by remember { mutableStateOf<Uri?>(null) }
+
+    val cameraLauncher = rememberLauncherForActivityResult(TakePicture()) { captured ->
+        val uri = pendingCameraUri
+        pendingCameraUri = null
+        if (captured && uri != null) {
+            coroutineScope.launch {
+                isImporting = true
+                errorMessage = null
+                runCatching { importCameraPhoto(uri) }
+                    .onSuccess(onSingleImported)
+                    .onFailure { errorMessage = "Could not save camera photo. Please try again." }
+                isImporting = false
+            }
+        }
+    }
 
     val singlePhotoPicker = rememberLauncherForActivityResult(PickVisualMedia()) { uri ->
         if (uri != null) {
@@ -90,9 +109,9 @@ fun CaptureScreen(
         Button(
             enabled = !isImporting,
             onClick = {
-                singlePhotoPicker.launch(
-                    PickVisualMediaRequest(PickVisualMedia.ImageOnly)
-                )
+                val uri = createCameraImageUri()
+                pendingCameraUri = uri
+                cameraLauncher.launch(uri)
             },
             modifier = Modifier.fillMaxWidth()
         ) {

@@ -17,6 +17,18 @@ class LocalImageStorage(
         return file.absolutePath
     }
 
+    override fun delete(path: String): Boolean {
+        val file = File(path)
+        val imageDirectory = File(filesDir, IMAGE_DIRECTORY).canonicalFile
+        val target = file.canonicalFile
+
+        if (!target.path.startsWith(imageDirectory.path)) {
+            return false
+        }
+
+        return !target.exists() || target.delete()
+    }
+
     private fun extensionFor(displayName: String): String {
         val extension = displayName.substringAfterLast('.', missingDelimiterValue = "jpg")
         return extension.takeIf { it.isNotBlank() && it != displayName } ?: "jpg"

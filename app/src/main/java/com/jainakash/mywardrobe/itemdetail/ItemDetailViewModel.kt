@@ -2,6 +2,7 @@ package com.jainakash.mywardrobe.itemdetail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.jainakash.mywardrobe.data.ImageStorage
 import com.jainakash.mywardrobe.data.WardrobeRepository
 import com.jainakash.mywardrobe.domain.WardrobeCategory
 import kotlinx.coroutines.CoroutineDispatcher
@@ -14,6 +15,7 @@ import kotlinx.coroutines.launch
 
 class ItemDetailViewModel(
     private val repository: WardrobeRepository,
+    private val imageStorage: ImageStorage,
     private val itemId: Long,
     initialState: ItemFormState = ItemFormState(),
     coroutineScope: CoroutineScope? = null,
@@ -72,6 +74,15 @@ class ItemDetailViewModel(
         scope.launch(dispatcher) {
             repository.updateItem(state.toWardrobeItem(itemId))
             onSaved()
+        }
+    }
+
+    fun delete(onDeleted: () -> Unit) {
+        val state = _formState.value
+        scope.launch(dispatcher) {
+            repository.deleteItem(state.toWardrobeItem(itemId))
+            imageStorage.delete(state.photoPath)
+            onDeleted()
         }
     }
 }

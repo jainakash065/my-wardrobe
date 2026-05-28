@@ -63,6 +63,7 @@ fun MyWardrobeNavHost(appContainer: AppContainer) {
                 CaptureViewModel(
                     repository = appContainer.wardrobeRepository,
                     imageCaptureController = ImageCaptureController(
+                        context = context.applicationContext,
                         contentResolver = context.contentResolver,
                         imageStorage = appContainer.imageStorage
                     )
@@ -77,6 +78,8 @@ fun MyWardrobeNavHost(appContainer: AppContainer) {
                 onBatchImported = {
                     navController.navigate(AppRoute.ReviewQueue.route)
                 },
+                createCameraImageUri = viewModel::createCameraImageUri,
+                importCameraPhoto = viewModel::importCameraPhoto,
                 importSingle = viewModel::importSingle,
                 importBatch = viewModel::importBatch
             )
@@ -92,6 +95,7 @@ fun MyWardrobeNavHost(appContainer: AppContainer) {
             val viewModel = remember(itemId) {
                 ItemDetailViewModel(
                     repository = appContainer.wardrobeRepository,
+                    imageStorage = appContainer.imageStorage,
                     itemId = itemId
                 )
             }
@@ -111,9 +115,13 @@ fun MyWardrobeNavHost(appContainer: AppContainer) {
                         navController.navigate(AppRoute.Wardrobe.route)
                     }
                 },
-                onDeleteClicked = { navController.navigate(AppRoute.Wardrobe.route) },
+                onDeleteClicked = {
+                    viewModel.delete {
+                        navController.navigate(AppRoute.Wardrobe.route)
+                    }
+                },
                 onBackClicked = { navController.popBackStack() },
-                showDelete = false
+                showDelete = true
             )
         }
     }

@@ -18,6 +18,14 @@ class CaptureViewModel(
         repository.saveDraft(WardrobeItemDraft(photoPath = photoPath))
     }
 
+    suspend fun importCameraPhoto(uri: Uri): Long = withContext(ioDispatcher) {
+        val photoPath = imageCaptureController.saveCameraImage(uri)
+        repository.saveDraft(WardrobeItemDraft(photoPath = photoPath))
+    }
+
+    fun createCameraImageUri(): Uri =
+        imageCaptureController.createCameraImageUri()
+
     suspend fun importBatch(uris: List<Uri>): List<Long> =
         uris.map { uri -> importSingle(uri) }
 }
